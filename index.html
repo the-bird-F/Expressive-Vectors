@@ -1,364 +1,586 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html>
+
 <head>
-  <meta charset="UTF-8">
-  <title>跨方言语音合成展示</title>
-  <style>
-    body {
-      font-family: "Noto Sans SC", sans-serif;
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 2em;
-      background-color: #f9f9f9;
-      line-height: 1.6;
-      color: #333;
-    }
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,900' rel='stylesheet' type='text/css'>
+    <link href="style.css" rel="stylesheet">
+    <meta charset="utf-8">
 
-    h1, h2, h3 {
-      color: #2c3e50;
-      margin-top: 2em;
-    }
-
-    .section {
-      margin-bottom: 3em;
-    }
-
-    .audio-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-
-    .audio-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      margin-top: 1em;
-    }
-
-    .audio-block {
-      background: #fff;
-      padding: 1em;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-      flex: 1 1 28%;
-      min-width: 200px;
-    }
-
-    .audio-label {
-      font-weight: bold;
-      margin-bottom: 0.5em;
-    }
-
-    .audio-box {
-      background: #fff;
-      padding: 1em;
-      margin: 1em 0;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: #fff;
-      margin-top: 1em;
-    }
-
-    th, td {
-      border: 1px solid #ddd;
-      padding: 0.6em;
-      text-align: center;
-    }
-
-    th {
-      background: #f2f2f2;
-    }
-  </style>
+	<title>Dialect Vector</title>
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    
 </head>
-<body>
 
-  <h1 style="text-align: center;">方言语音合成展示</h1>
+<body data-new-gr-c-s-check-loaded="14.1091.0" data-gr-ext-installed="">
 
-  <div class="section">
-    <h2>一、F5TTS_v1_Base：跨方言合成效果</h2>
+<style>
+        table {
+          border-collapse: collapse;
+        }
+        th, td {
+          padding: 8px;
+        }
+      
+        td:nth-child(3), th:nth-child(3) {
+          position: relative;
+        }
+      
+        td:nth-child(3)::after, th:nth-child(3)::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 1px;      
+          height: 100%;
+          background-color: rgb(219, 207, 207);
+          transform: translateX(5px);
+        }
+      </style>
+<div class="container" >
+<header role="banner">
+</header>
+<main role="main">
+<article itemscope itemtype="https://schema.org/BlogPosting">
 
-    <div class="audio-box">
-      <p><strong>参考录音：</strong>这是参考录音，用于合成语音</p>
-      <audio controls src="myself.wav"></audio>
+<div class="container pt-5 mt-5 shadow p-5 mb-5 bg-white rounded">
+    <div class="column has-text-centered">
+    <!-- <h1 class="title is-1 publication-title"> <b>WeSCon:</b>  </h1> -->
+    <h3 class="title is-2 publication-title"> <b>From Efficient Cross-Dialect Synthesis to Controllable Multi-Style Speech Synthesis</b></h3>
     </div>
-    <div class="audio-box">
-      <p><strong>合成文本：</strong>大家好，我是凤鹏超，来自上海交通大学电子信息与电气工程学院二零二二级人工智能班。我迷恋乒乓飞舞的韵律、楚河汉界的玄机，更爱执笔绘就丹青、行至山河万里。虽然我不会说方言，但是我正在说方言。你们觉得我说的像不像呢？</p>
-    </div>
-    
-    <h3>1. 上海方言 (60k steps)</h3>
-    <div class="audio-group">
-      <div class="audio-block"><div class="audio-label">1</div><audio controls src="Base_v1/my_shanghai_x2.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">2+</div><audio controls src="Base_v1/my_shanghai_x3.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">3+</div><audio controls src="Base_v1/my_shanghai_x4.wav"></audio></div>
-    </div>
+    <br>
+    <!-- authors -->
+    <!-- <div class="is-size-5">
+        <span class="author-block">
+          <h4 style="text-align: center;"><b>Authors: </h4>
+    </div> -->
+    <!-- unit -->
+    <!-- <div class="is-size-5 publication-authors"> -->
+        <!-- <span class="author-block"><h4 style="text-align: center;"><b style="color:#d76100; font-weight:normal">&#x25B6 </b></h4></span> -->
+    <!-- </div> -->
 
-    <h3>2. 广东方言 (60k steps)</h3>
-    <div class="audio-group">
-      <div class="audio-block"><div class="audio-label">1</div><audio controls src="Base_v1/my_guangzhoudaily_x2.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">2+</div><audio controls src="Base_v1/my_guangzhoudaily_x3.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">3+</div><audio controls src="Base_v1/my_guangzhoudaily_x4.wav"></audio></div>
-    </div>
 
-    <h3>3. 武汉方言 (60k steps)</h3>
-    <div class="audio-group">
-      <div class="audio-block"><div class="audio-label">1</div><audio controls src="Base_v1/my_wuhan_x2.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">2+</div><audio controls src="Base_v1/my_wuhan_x3.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">3+</div><audio controls src="Base_v1/my_wuhan_x4.wav"></audio></div>
-    </div>
+    <div class="column has-text-centered">
 
-    <h3>4. 天津方言 (60k steps)</h3>
-    <div class="audio-group">
-      <div class="audio-block"><div class="audio-label">1</div><audio controls src="Base_v1/my_tianjin_x2.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">2+</div><audio controls src="Base_v1/my_tianjin_x3.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">3+</div><audio controls src="Base_v1/my_tianjin_x4.wav"></audio></div>
-    </div>
-
-    <h3>5. 郑州方言 (60k steps)</h3>
-    <div class="audio-group">
-      <div class="audio-block"><div class="audio-label">1</div><audio controls src="Base_v1/my_zhengzhou_x2.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">2+</div><audio controls src="Base_v1/my_zhengzhou_x3.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">3+</div><audio controls src="Base_v1/my_zhengzhou_x4.wav"></audio></div>
-    </div>
-
-    <h3>6. 长沙方言 (60k steps)</h3>
-    <div class="audio-group">
-      <div class="audio-block"><div class="audio-label">1</div><audio controls src="Base_v1/my_changsha_x2.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">2+</div><audio controls src="Base_v1/my_changsha_x3.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">3+</div><audio controls src="Base_v1/my_changsha_x4.wav"></audio></div>
-    </div>
-
-    <p>KeSpeech 数据集</p>
-
-    <h3>7. 北京方言 (80k steps)</h3>
-    <div class="audio-group">
-      <div class="audio-block"><div class="audio-label">1</div><audio controls src="Base_v1/K_Beijing_x5.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">2+</div><audio controls src="Base_v1/K_Beijing_x6.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">3+</div><audio controls src="Base_v1/K_Beijing_x7.wav"></audio></div>
-    </div>
-
-    <h3>8. 冀鲁方言 (80k steps)</h3>
-    <div class="audio-group">
-      <div class="audio-block"><div class="audio-label">1</div><audio controls src="Base_v1/K_Ji-Lu_x5.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">2+</div><audio controls src="Base_v1/K_Ji-Lu_x6.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">3+</div><audio controls src="Base_v1/K_Ji-Lu_x7.wav"></audio></div>
-    </div>
-
-    <h3>9. 江淮方言 (80k steps)</h3>
-    <div class="audio-group">
-      <div class="audio-block"><div class="audio-label">1</div><audio controls src="Base_v1/K_Jiang-Huai_x5.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">2+</div><audio controls src="Base_v1/K_Jiang-Huai_x6.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">3+</div><audio controls src="Base_v1/K_Jiang-Huai_x7.wav"></audio></div>
+        <!-- <span class="link-block">
+            <a href="?????" target="_blank"
+            class="external-link button is-normal is-rounded is-dark">
+            <span class="icon">
+                <i class="ai ai-arxiv"></i>
+            </span>
+            <span>Paper</span>
+            </a>
+        </span> -->
+        
+        <span class="link-block">
+            <a href="https://github.com/the-bird-F/Dialect-Vector" target="_blank"
+            class="external-link button is-normal is-rounded is-dark">
+            <span class="icon">
+                <i class="fab fa-github"></i>
+            </span>
+            <span>Github will be released soon</span>
+            </a>
+        </span>
     </div>
 
-    <h3>10. 焦辽方言 (80k steps)</h3>
-    <div class="audio-group">
-      <div class="audio-block"><div class="audio-label">1</div><audio controls src="Base_v1/K_Jiao-Liao_x5.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">2+</div><audio controls src="Base_v1/K_Jiao-Liao_x6.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">3+</div><audio controls src="Base_v1/K_Jiao-Liao_x7.wav"></audio></div>
+</div>
+
+<div class="container pt-5 mt-5 shadow p-5 mb-5 bg-white rounded">
+    <div class="columns is-centered has-text-centered">
+        <div class="column is-six-fifths">
+          <h2 class="title is-3">Overview</h2>
+        </div>
     </div>
+    <p style="font-size: 18px;">
+       While recent advances in text-to-speech (TTS) have led to remarkable improvements, controllably altering the subjective styles of the speech, such as generating dialect from a Mandarin prompt, remains a significant challenge. To address this, we propose Dialect Vector, which enables high-quality cross-dialect speech synthesis with improved training efficiency and model flexibility. We further extend this approach to zero-shot emotional speech synthesis, demonstrating its broad applicability to editing subjective speech features. In addition, we introduce the LoRA Merging Task Algorithm, which combines multiple task vectors to achieve controllable multi-emotion, cross-dialect speech synthesis with enhanced quality. Experimental results show that our method achieves superior performance in dialect synthesis, while revealing the challenges of multi-style speech synthesis.</p>
 
-    <h3>11. 兰银方言 (80k steps)</h3>
-    <div class="audio-group">
-      <div class="audio-block"><div class="audio-label">1</div><audio controls src="Base_v1/K_Lan-Yin_x5.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">2+</div><audio controls src="Base_v1/K_Lan-Yin_x6.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">3+</div><audio controls src="Base_v1/K_Lan-Yin_x7.wav"></audio></div>
+    <div style="display: flex; justify-content: center; gap: 20px;">
+        <div style="text-align: center; width: 24%;">
+            <img id="teaser" style="width: 100%;" src="resources/Picture1.svg">  
+            <p style="font-style: italic; margin-top: 8px;">
+                (a) Build        </p>
+        </div>
+        <div style="text-align: center; width: 24%;">
+            <img id="teaser" style="width: 100%; background: white" src="resources/Picture2.svg">    
+            <p style="font-style: italic; margin-top: 8px;">
+                (b) Enhance     </p>
+        </div>
+        <div style="text-align: center; width: 24%;">
+          <img id="teaser" style="width: 100%;" src="resources/Picture3.svg">  
+          <p style="font-style: italic; margin-top: 8px;">
+              (c) Direct Merge         </p>
+        </div>
+        <div style="text-align: center; width: 24%;">
+            <img id="teaser" style="width: 100%; background: white" src="resources/Picture4.svg">    
+            <p style="font-style: italic; margin-top: 8px;">
+                (d) LoRA Merge   </p>
+        </div>
     </div>
-
-    <h3>12. 东北方言 (80k steps)</h3>
-    <div class="audio-group">
-      <div class="audio-block"><div class="audio-label">1</div><audio controls src="Base_v1/K_Northeastern_x5.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">2+</div><audio controls src="Base_v1/K_Northeastern_x6.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">3+</div><audio controls src="Base_v1/K_Northeastern_x7.wav"></audio></div>
-    </div>
-
-    <h3>13. 西南方言 (80k steps)</h3>
-    <div class="audio-group">
-      <div class="audio-block"><div class="audio-label">1</div><audio controls src="Base_v1/K_Southwestern_x5.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">2+</div><audio controls src="Base_v1/K_Southwestern_x6.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">3+</div><audio controls src="Base_v1/K_Southwestern_x7.wav"></audio></div>
-    </div>
+</div>
 
 
-  </div>
-  <div class="section">
-    <h2>二、F5TTS_v1_Small：实验与效果</h2>
-    <h3>1. 主观测评维度</h3>
-    <ul>
-      <li><strong>语音合成质量（Quality）</strong>：流畅度、错误率、停顿自然性</li>
-      <li><strong>方言味（DialectSense）</strong>：是否贴合方言、发音是否地道</li>
-    </ul>
+<div class="container pt-5 mt-5 shadow p-5 mb-5 bg-white rounded">
+    <h3>Dialect Synthesis</h3>
+    <h6>Synthesizing dialectal speech from a Mandarin prompt.</h6>
+    <div class="table-responsive pt-3">
+        <table class="table table-hover pt-2 text-center">
+            <thead>
+                <tr>
+                    <th class="align-middle" style="min-width: 150px;">Target Text</th>
+                    <th class="align-middle" style="width: 100px;">Target Speaker</th>
+                    <th class="align-middle">Target Dialect</th>
+                    <th class="align-middle">CosyVoice2</th>
+                    <th class="align-middle">FT</th>
+                    <th class="align-middle">FT-last</th>
+                    <th class="align-middle">Enhanced</th>
+                    <th class="align-middle">LoRA Enhanced</th>
+                </tr>
+            </thead>
+            <tbody>
 
-    <h3>2. 不同 NFE 设置下合成效果 </h3>
-    <table>
-      <caption><strong>表 1：不同 NFE 下语音合成性能与效率对比</strong></caption>
-      <thead>
-        <tr><th>NFE</th><th>Time (s)</th><th>Quality</th><th>DialectSense</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>16</td><td>5.46</td><td>3</td><td>4.5</td></tr>
-        <tr><td>32</td><td>7.53</td><td>4</td><td>4.5</td></tr>
-        <tr><td>48</td><td>8.79</td><td>4.5</td><td>4.5</td></tr>
-        <tr><td>64</td><td>12.03</td><td>4</td><td>4.5</td></tr>
-      </tbody>
-    </table>
+                <tr>
+                  <td style="vertical-align: middle; text-align: center;"> 当时真害怕风雨过来揭掉屋顶铁皮</td>
+                  <td style="vertical-align: middle; text-align: center;">
+                      <div style="width:100px; word-wrap: break-word;">我说你这只大鸟，真是不讲理，我对你做什么了呀，你就要吞了我！</div>
+                      <audio controls style="width:100px;">
+                        <source src="wav/Prompt_use/wav/Prompt_Domain_Audiobook_Zh_Female_1.wav" type="audio/wav">
+                      </audio>
+                  </td>
+                  <td style="vertical-align: middle; text-align: center;"><b>陕西话</b></td>
+                  <td style="vertical-align: middle; text-align: center;">
+                      <audio controls style="width:100px;">
+                          <source src="wav/Xian_002570/1.wav" type="audio/wav">
+                      </audio>
+                  </td>
+                  <td style="vertical-align: middle; text-align: center;">                        
+                      <audio controls style="width:100px;">
+                          <source src="wav/Xian_002570/3.wav" type="audio/wav">
+                      </audio>
+                  </td>
+                  <td style="vertical-align: middle; text-align: center;">
+                      <audio controls style="width:100px;">
+                          <source src="wav/Xian_002570/4.wav" type="audio/wav">
+                      </audio>
+                  </td>
+                  <td style="vertical-align: middle; text-align: center;">
+                      <audio controls style="width:100px;">
+                          <source src="wav/Xian_002570/2.wav" type="audio/wav">
+                      </audio>
+                  </td>
+                  <td style="vertical-align: middle; text-align: center;">
+                      <audio controls style="width:100px;">
+                          <source src="wav/Xian_002570/5.wav" type="audio/wav">
+                      </audio>
+                  </td>
+              </tr>  
+                
+              <tr>
+                <td style="vertical-align: middle; text-align: center;">你唔讲系人都知你系神经质儿童嚟噶啦</td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <div style="width:100px; word-wrap: break-word;">前段时间我面试了六个年轻人，我是倒吸了一口凉气。</div>
+                    <audio controls style="width:100px;">
+                      <source src="wav/Prompt_use/wav/Prompt_明星_马云_1.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;"><b>广东话</b></td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <audio controls style="width:100px;">
+                        <source src="wav/Guangzhou_004490/1.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">                        
+                    <audio controls style="width:100px;">
+                        <source src="wav/Guangzhou_004490/3.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <audio controls style="width:100px;">
+                        <source src="wav/Guangzhou_004490/4.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <audio controls style="width:100px;">
+                        <source src="wav/Guangzhou_004490/2.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <audio controls style="width:100px;">
+                        <source src="wav/Guangzhou_004490/5.wav" type="audio/wav">
+                    </audio>
+                </td>
+            </tr>  
+              
+            <tr>
+              <td style="vertical-align: middle; text-align: center;">给俺设置上下管加风扇一百二十度六小时</td>
+              <td style="vertical-align: middle; text-align: center;">
+                  <div style="width:100px; word-wrap: break-word;">于是军士归心，因此这雄主二字可谓是搔到了他的痒处。</div>
+                  <audio controls style="width:100px;">
+                    <source src="wav/Prompt_use/wav/Prompt_Domain_Audiobook_Zh_Male_1.wav" type="audio/wav">
+                  </audio>
+              </td>
+              <td style="vertical-align: middle; text-align: center;"><b>山东话</b></td>
+              <td style="vertical-align: middle; text-align: center;">
+                  <audio controls style="width:100px;">
+                      <source src="wav/Jinan_007413/1.wav" type="audio/wav">
+                  </audio>
+              </td>
+              <td style="vertical-align: middle; text-align: center;">                        
+                  <audio controls style="width:100px;">
+                      <source src="wav/Jinan_007413/3.wav" type="audio/wav">
+                  </audio>
+              </td>
+              <td style="vertical-align: middle; text-align: center;">
+                  <audio controls style="width:100px;">
+                      <source src="wav/Jinan_007413/4.wav" type="audio/wav">
+                  </audio>
+              </td>
+              <td style="vertical-align: middle; text-align: center;">
+                  <audio controls style="width:100px;">
+                      <source src="wav/Jinan_007413/2.wav" type="audio/wav">
+                  </audio>
+              </td>
+              <td style="vertical-align: middle; text-align: center;">
+                  <audio controls style="width:100px;">
+                      <source src="wav/Jinan_007413/5.wav" type="audio/wav">
+                  </audio>
+              </td>
+          </tr>
 
-    <div class="audio-group">
-      <div class="audio-block"><div class="audio-label">NFE = 16</div><audio controls src="Small_v1/myself_sichuan/nfe/myself_sichuan_n16.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">NFE = 32</div><audio controls src="Small_v1/myself_sichuan/nfe/myself_sichuan_n32.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">NFE = 48</div><audio controls src="Small_v1/myself_sichuan/nfe/myself_sichuan_n48.wav"></audio></div>
-      <div class="audio-block"><div class="audio-label">NFE = 64</div><audio controls src="Small_v1/myself_sichuan/nfe/myself_sichuan_n64.wav"></audio></div>
-    </div>
-
-    <h3>3. 消融实验 </h3>
-    <table>
-      <caption><strong>表 2：不同微调步数与增强设置对比结果（NFE = 32）</strong></caption>
-      <thead>
-        <tr>
-          <th>FT</th>
-          <th>α (Enhance)</th>
-          <th>Quality</th>
-          <th>DialectSense</th>
+          <tr>
+            <td style="vertical-align: middle; text-align: center;">所以啊这个豆子就生不出来哈所以后头他们打兵的时候他就就那个就非常的非常的</td>
+            <td style="vertical-align: middle; text-align: center;">
+                <div style="width:100px; word-wrap: break-word;">于是军士归心，因此这雄主二字可谓是搔到了他的痒处。</div>
+                <audio controls style="width:100px;">
+                  <source src="wav/Prompt_use/wav/Prompt_Domain_Audiobook_Zh_Male_1.wav" type="audio/wav">
+                </audio>
+            </td>
+            <td style="vertical-align: middle; text-align: center;"><b>四川话</b></td>
+            <td style="vertical-align: middle; text-align: center;">
+                <audio controls style="width:100px;">
+                    <source src="wav/Sichuan_001206/1.wav" type="audio/wav">
+                </audio>
+            </td>
+            <td style="vertical-align: middle; text-align: center;">                        
+                <audio controls style="width:100px;">
+                    <source src="wav/Sichuan_001206/3.wav" type="audio/wav">
+                </audio>
+            </td>
+            <td style="vertical-align: middle; text-align: center;">
+                <audio controls style="width:100px;">
+                    <source src="wav/Sichuan_001206/4.wav" type="audio/wav">
+                </audio>
+            </td>
+            <td style="vertical-align: middle; text-align: center;">
+                <audio controls style="width:100px;">
+                    <source src="wav/Sichuan_001206/2.wav" type="audio/wav">
+                </audio>
+            </td>
+            <td style="vertical-align: middle; text-align: center;">
+                <audio controls style="width:100px;">
+                    <source src="wav/Sichuan_001206/5.wav" type="audio/wav">
+                </audio>
+            </td>
         </tr>
-      </thead>
-      <tbody>
-        <tr><td>0</td><td>1</td><td>4</td><td>1</td></tr>
-        <tr><td>60k</td><td>1</td><td>4</td><td>1.5</td></tr>
-        <tr><td>60k</td><td>2+</td><td>4</td><td>4</td></tr>
-        <tr><td>60k</td><td>3+</td><td>4</td><td>4.5</td></tr>
-        <tr><td>80k</td><td>1</td><td>4</td><td>3.5</td></tr>
-        <tr><td>80k</td><td>2+</td><td>3</td><td>3.5</td></tr>
-        <tr><td>80k</td><td>3+</td><td>2.5</td><td>4</td></tr>
-        <tr><td>100k</td><td>1</td><td>3</td><td>2</td></tr>
-        <tr><td>100k</td><td>2+</td><td>3.5</td><td>3.5</td></tr>
-        <tr><td>100k</td><td>3+</td><td>1</td><td>2.5</td></tr>
-      </tbody>
-    </table>
-    
-      <!-- 第一条参考语音 -->
-      <div class="audio-group">
-        <div class="audio-block">
-          <div class="audio-label">1. base model</div>
-          <audio controls src="Small_v1/myself_sichuan/multi/myself_sichuan_x1.wav"></audio>
-        </div>
-      </div>
-    
-      <!-- 后面每 3 个音频为一组 -->
-      <div class="audio-container">
-        <div class="audio-group">
-          <div class="audio-block">
-            <div class="audio-label">2.</div>
-            <audio controls src="Small_v1/myself_sichuan/multi/myself_sichuan_x2.wav"></audio>
-          </div>
-          <div class="audio-block">
-            <div class="audio-label">3.</div>
-            <audio controls src="Small_v1/myself_sichuan/multi/myself_sichuan_x3.wav"></audio>
-          </div>
-          <div class="audio-block">
-            <div class="audio-label">4.</div>
-            <audio controls src="Small_v1/myself_sichuan/multi/myself_sichuan_x4.wav"></audio>
-          </div>
-        </div>
-    
-        <div class="audio-group">
-          <div class="audio-block">
-            <div class="audio-label">5.</div>
-            <audio controls src="Small_v1/myself_sichuan/multi/myself_sichuan_x5.wav"></audio>
-          </div>
-          <div class="audio-block">
-            <div class="audio-label">6.</div>
-            <audio controls src="Small_v1/myself_sichuan/multi/myself_sichuan_x6.wav"></audio>
-          </div>
-          <div class="audio-block">
-            <div class="audio-label">7.</div>
-            <audio controls src="Small_v1/myself_sichuan/multi/myself_sichuan_x7.wav"></audio>
-          </div>
-        </div>
-    
-        <div class="audio-group">
-          <div class="audio-block">
-            <div class="audio-label">8.</div>
-            <audio controls src="Small_v1/myself_sichuan/multi/myself_sichuan_x8.wav"></audio>
-          </div>
-          <div class="audio-block">
-            <div class="audio-label">9.</div>
-            <audio controls src="Small_v1/myself_sichuan/multi/myself_sichuan_x9.wav"></audio>
-          </div>
-          <div class="audio-block">
-            <div class="audio-label">10.</div>
-            <audio controls src="Small_v1/myself_sichuan/multi/myself_sichuan_x10.wav"></audio>
-          </div>
-        </div>
-      </div>
 
-    <h3>4. 其他方言展示</h3>
-  
-    <div class="audio-container">
-      <p><strong>上海方言展示：</strong></p>
-      <p><strong>(FT = 60 k steps, NFE = 32)</strong></p>
-      <div class="audio-group">
-        <div class="audio-block">
-          <div class="audio-label">1</div>
-          <audio controls>
-            <source src="Small_v1/myself_shanghai/multi/myself_shanghai_x2.wav" type="audio/wav">
+        <tr>
+          <td style="vertical-align: middle; text-align: center;">播放这条街一头狗加一头猪是什么呀</td>
+          <td style="vertical-align: middle; text-align: center;">
+              <div style="width:100px; word-wrap: break-word;">主播说联播，今天我来说</div>
+              <audio controls style="width:100px;">
+                <source src="wav/Prompt_use/wav/Prompt_Domain_News_Zh_Female_1.wav" type="audio/wav">
+              </audio>
+          </td>
+          <td style="vertical-align: middle; text-align: center;"><b>郑州话</b></td>
+          <td style="vertical-align: middle; text-align: center;">
+              <audio controls style="width:100px;">
+                  <source src="wav/Zhengzhou_006277/1.wav" type="audio/wav">
+              </audio>
+          </td>
+          <td style="vertical-align: middle; text-align: center;">                        
+              <audio controls style="width:100px;">
+                  <source src="wav/Zhengzhou_006277/3.wav" type="audio/wav">
+              </audio>
+          </td>
+          <td style="vertical-align: middle; text-align: center;">
+              <audio controls style="width:100px;">
+                  <source src="wav/Zhengzhou_006277/4.wav" type="audio/wav">
+              </audio>
+          </td>
+          <td style="vertical-align: middle; text-align: center;">
+              <audio controls style="width:100px;">
+                  <source src="wav/Zhengzhou_006277/2.wav" type="audio/wav">
+              </audio>
+          </td>
+          <td style="vertical-align: middle; text-align: center;">
+              <audio controls style="width:100px;">
+                  <source src="wav/Zhengzhou_006277/5.wav" type="audio/wav">
+              </audio>
+          </td>
+      </tr>
+
+          <tr>
+            <td style="vertical-align: middle; text-align: center;">读书的辰光学堂里从小就教英文所以讲也会的讲英文</td>
+            <td style="vertical-align: middle; text-align: center;">
+                <div style="width:100px; word-wrap: break-word;">人生就像一场马拉松比赛，重要的是坚持不懈地向前跑，而不仅仅是关注眼前的一小段路程。</div>
+                <audio controls style="width:100px;">
+                  <source src="wav/Prompt_use/wav/Prompt_Character_gaolengyujie_Zh_Female_1.wav" type="audio/wav">
+                </audio>
+            </td>
+            <td style="vertical-align: middle; text-align: center;"><b>上海话</b></td>
+            <td style="vertical-align: middle; text-align: center;">
+                <audio controls style="width:100px;">
+                    <source src="wav/Shanghai_004043/1.wav" type="audio/wav">
+                </audio>
+            </td>
+            <td style="vertical-align: middle; text-align: center;">                        
+                <audio controls style="width:100px;">
+                    <source src="wav/Shanghai_004043/3.wav" type="audio/wav">
+                </audio>
+            </td>
+            <td style="vertical-align: middle; text-align: center;">
+                <audio controls style="width:100px;">
+                    <source src="wav/Shanghai_004043/4.wav" type="audio/wav">
+                </audio>
+            </td>
+            <td style="vertical-align: middle; text-align: center;">
+                <audio controls style="width:100px;">
+                    <source src="wav/Shanghai_004043/2.wav" type="audio/wav">
+                </audio>
+            </td>
+            <td style="vertical-align: middle; text-align: center;">
+                <audio controls style="width:100px;">
+                    <source src="wav/Shanghai_004043/5.wav" type="audio/wav">
+                </audio>
+            </td>
+        </tr>
+        <tr>
+          <td style="vertical-align: middle; text-align: center;">关于此事的报道成了人们生活中议论的焦点</td>
+            <td style="vertical-align: middle; text-align: center;">
+              <div style="width:100px; word-wrap: break-word;">前段时间我面试了六个年轻人，我是倒吸了一口凉气。</div>
+              <audio controls style="width:100px;">
+                <source src="wav/Prompt_use/wav/Prompt_明星_马云_1.wav" type="audio/wav">
+              </audio>
+          </td>
+          </td>
+          <td style="vertical-align: middle; text-align: center;"><b>天津话</b></td>
+          <td style="vertical-align: middle; text-align: center;">
+              <audio controls style="width:100px;">
+                  <source src="wav/Tianjin_000295/1.wav" type="audio/wav">
+              </audio>
+          </td>
+          <td style="vertical-align: middle; text-align: center;">                        
+              <audio controls style="width:100px;">
+                  <source src="wav/Tianjin_000295/3.wav" type="audio/wav">
+              </audio>
+          </td>
+          <td style="vertical-align: middle; text-align: center;">
+              <audio controls style="width:100px;">
+                  <source src="wav/Tianjin_000295/4.wav" type="audio/wav">
+              </audio>
+          </td>
+          <td style="vertical-align: middle; text-align: center;">
+              <audio controls style="width:100px;">
+                  <source src="wav/Tianjin_000295/2.wav" type="audio/wav">
+              </audio>
+          </td>
+          <td style="vertical-align: middle; text-align: center;">
+              <audio controls style="width:100px;">
+                  <source src="wav/Tianjin_000295/5.wav" type="audio/wav">
+              </audio>
+          </td>
+      </tr>
+
+      <tr>
+        <td style="vertical-align: middle; text-align: center;">被黑滴童鞋们要团结起来</td>
+        <td style="vertical-align: middle; text-align: center;">
+          <div style="width:100px; word-wrap: break-word;">于是军士归心，因此这雄主二字可谓是搔到了他的痒处。</div>
+          <audio controls style="width:100px;">
+            <source src="wav/Prompt_use/wav/Prompt_Domain_Audiobook_Zh_Male_1.wav" type="audio/wav">
           </audio>
-        </div>
-    
-        <div class="audio-block">
-          <div class="audio-label">2+</div>
-          <audio controls>
-            <source src="Small_v1/myself_shanghai/multi/myself_shanghai_x3.wav" type="audio/wav">
-          </audio>
-        </div>
-    
-        <div class="audio-block">
-          <div class="audio-label">3+</div>
-          <audio controls>
-            <source src="Small_v1/myself_shanghai/multi/myself_shanghai_x4.wav" type="audio/wav">
-          </audio>
-        </div>
-      </div>
-      <p><strong>(FT = 80 k steps, NFE = 32)</strong></p>
-      <div class="audio-group">
-        <div class="audio-block">
-          <div class="audio-label">1</div>
-          <audio controls>
-            <source src="Small_v1/myself_shanghai/multi/myself_shanghai_x5.wav" type="audio/wav">
-          </audio>
-        </div>
-    
-        <div class="audio-block">
-          <div class="audio-label">2+</div>
-          <audio controls>
-            <source src="Small_v1/myself_shanghai/multi/myself_shanghai_x6.wav" type="audio/wav">
-          </audio>
-        </div>
-    
-        <div class="audio-block">
-          <div class="audio-label">3+</div>
-          <audio controls>
-            <source src="Small_v1/myself_shanghai/multi/myself_shanghai_x7.wav" type="audio/wav">
-          </audio>
-        </div>
-      </div>
+      </td>
+        </td>
+        <td style="vertical-align: middle; text-align: center;"><b>长沙话</b></td>
+        <td style="vertical-align: middle; text-align: center;">
+            <audio controls style="width:100px;">
+                <source src="wav/Changsha_007672/1.wav" type="audio/wav">
+            </audio>
+        </td>
+        <td style="vertical-align: middle; text-align: center;">                        
+            <audio controls style="width:100px;">
+                <source src="wav/Changsha_007672/3.wav" type="audio/wav">
+            </audio>
+        </td>
+        <td style="vertical-align: middle; text-align: center;">
+            <audio controls style="width:100px;">
+                <source src="wav/Changsha_007672/4.wav" type="audio/wav">
+            </audio>
+        </td>
+        <td style="vertical-align: middle; text-align: center;">
+            <audio controls style="width:100px;">
+                <source src="wav/Changsha_007672/2.wav" type="audio/wav">
+            </audio>
+        </td>
+        <td style="vertical-align: middle; text-align: center;">
+            <audio controls style="width:100px;">
+                <source src="wav/Changsha_007672/5.wav" type="audio/wav">
+            </audio>
+        </td>
+    </tr>
+            </tbody>
+        </table>
     </div>
-  </div>
+</div>
 
-  <script>
-    document.querySelectorAll('audio').forEach(audio => {
-      audio.addEventListener('play', function () {
-        document.querySelectorAll('audio').forEach(other => {
-          if (other !== audio) {
-            other.pause();
-          }
-        });
-      });
-    });
-  </script>
-</body>
-</html>
+
+
+<div class="container pt-5 mt-5 shadow p-5 mb-5 bg-white rounded">
+  <h3>Multi-style Speech Synthesis</h3>
+  <h6>Synthesizing speech from a Mandarin prompt together with the target emotion and dialect labels.</h6>
+  <div class="table-responsive pt-3">
+      <table class="table table-hover pt-2 text-center">
+          <thead>
+              <tr>
+                  <th class="align-middle" style="min-width: 150px;">Target Text</th>
+                  <th class="align-middle" style="width: 100px;">Target Speaker</th>
+                  <th class="align-middle">Target Labels</th>
+                  <th class="align-middle">CosyVoice2</th>
+                  <th class="align-middle">Two-stage</th>
+                  <th class="align-middle">Direct Merge</th>
+                  <th class="align-middle">LoRA Merge</th>
+              </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="vertical-align: middle; text-align: center;">别吓我啊怎么解决</td>
+              <td style="vertical-align: middle; text-align: center;">
+                  <div style="width:100px; word-wrap: break-word;">我老猪本是上界的天蓬元帅，不想下界之后错投了猪胎。</div>
+                  <audio controls style="width:100px;">
+                    <source src="wav/Prompt_use/wav/Prompt_Character_ZBJ_1.wav" type="audio/wav">
+                  </audio>
+              </td>
+              <td style="vertical-align: middle; text-align: center;"><b>河南话</b>+<b>happy</b></td>
+              <td style="vertical-align: middle; text-align: center;">
+                  <audio controls style="width:100px;">
+                      <source src="wav2/Zhengzhou_006710/1.wav" type="audio/wav">
+                  </audio>
+              </td>
+              <td style="vertical-align: middle; text-align: center;">                        
+                  <audio controls style="width:100px;">
+                      <source src="wav2/Zhengzhou_006710/2.wav" type="audio/wav">
+                  </audio>
+              </td>
+              <td style="vertical-align: middle; text-align: center;">
+                  <audio controls style="width:100px;">
+                      <source src="wav2/Zhengzhou_006710/3.wav" type="audio/wav">
+                  </audio>
+              </td>
+              <td style="vertical-align: middle; text-align: center;">
+                  <audio controls style="width:100px;">
+                      <source src="wav2/Zhengzhou_006710/4.wav" type="audio/wav">
+                  </audio>
+              </td>
+          </tr>  
+
+              <tr>
+                <td style="vertical-align: middle; text-align: center;"> 抑或产业群聚集度高导致的成本低</td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <div style="width:100px; word-wrap: break-word;">哈尔滨亚冬会中国体育代表团正式成立了</div>
+                    <audio controls style="width:100px;">
+                      <source src="wav/Prompt_use/wav/Prompt_Domain_News_Zh_Male_1.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;"><b>天津话</b>+<b>sad</b></td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <audio controls style="width:100px;">
+                        <source src="wav2/Tianjin_001901/1.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">                        
+                    <audio controls style="width:100px;">
+                        <source src="wav2/Tianjin_001901/2.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <audio controls style="width:100px;">
+                        <source src="wav2/Tianjin_001901/3.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <audio controls style="width:100px;">
+                        <source src="wav2/Tianjin_001901/4.wav" type="audio/wav">
+                    </audio>
+                </td>
+            </tr>  
+              
+            <tr>
+              <td style="vertical-align: middle; text-align: center;">早上一只苹果和桃子我和豆豆一人一半</td>
+              <td style="vertical-align: middle; text-align: center;">
+                  <div style="width:100px; word-wrap: break-word;">主播说联播，今天我来说。</div>
+                  <audio controls style="width:100px;">
+                    <source src="wav/Prompt_use/wav/Prompt_Domain_News_Zh_Female_1.wav" type="audio/wav">
+                  </audio>
+              </td>
+              <td style="vertical-align: middle; text-align: center;"><b>上海话</b>+<b>angry</b></td>
+              <td style="vertical-align: middle; text-align: center;">
+                  <audio controls style="width:100px;">
+                      <source src="wav2/Shanghai_003571/1.wav" type="audio/wav">
+                  </audio>
+              </td>
+              <td style="vertical-align: middle; text-align: center;">                        
+                  <audio controls style="width:100px;">
+                      <source src="wav2/Shanghai_003571/2.wav" type="audio/wav">
+                  </audio>
+              </td>
+              <td style="vertical-align: middle; text-align: center;">
+                  <audio controls style="width:100px;">
+                      <source src="wav2/Shanghai_003571/3.wav" type="audio/wav">
+                  </audio>
+              </td>
+              <td style="vertical-align: middle; text-align: center;">
+                  <audio controls style="width:100px;">
+                      <source src="wav2/Shanghai_003571/4.wav" type="audio/wav">
+                  </audio>
+              </td>
+          </tr>  
+          <tr>
+            <td style="vertical-align: middle; text-align: center;"> 当时真害怕风雨过来揭掉屋顶铁皮</td>
+              <td style="vertical-align: middle; text-align: center;">
+                  <div style="width:100px; word-wrap: break-word;">我说你这只大鸟，真是不讲理，我对你做什么了呀，你就要吞了我！</div>
+                  <audio controls style="width:100px;">
+                    <source src="wav/Prompt_use/wav/Prompt_Domain_Audiobook_Zh_Female_1.wav" type="audio/wav">
+                  </audio>
+              </td>
+            <td style="vertical-align: middle; text-align: center;"><b>陕西话</b>+<b>surprise</b></td>
+            <td style="vertical-align: middle; text-align: center;">
+                <audio controls style="width:100px;">
+                    <source src="wav2/Xian_002570/1.wav" type="audio/wav">
+                </audio>
+            </td>
+            <td style="vertical-align: middle; text-align: center;">                        
+                <audio controls style="width:100px;">
+                    <source src="wav2/Xian_002570/2.wav" type="audio/wav">
+                </audio>
+            </td>
+            <td style="vertical-align: middle; text-align: center;">
+                <audio controls style="width:100px;">
+                    <source src="wav2/Xian_002570/3.wav" type="audio/wav">
+                </audio>
+            </td>
+            <td style="vertical-align: middle; text-align: center;">
+                <audio controls style="width:100px;">
+                    <source src="wav2/Xian_002570/4.wav" type="audio/wav">
+                </audio>
+            </td>
+        </tr>  
+
+          </tbody>
+      </table>
+  </div>
+</div>
+
