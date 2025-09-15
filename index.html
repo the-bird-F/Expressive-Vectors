@@ -52,7 +52,7 @@
 <div class="container pt-5 mt-5 shadow p-5 mb-5 bg-white rounded">
     <div class="column has-text-centered">
     <!-- <h1 class="title is-1 publication-title"> <b>WeSCon:</b>  </h1> -->
-    <h3 class="title is-2 publication-title"> <b>From Efficient Cross-Dialect Synthesis to Controllable Multi-Style Speech Synthesis</b></h3>
+    <h3 class="title is-2 publication-title"> <b>Expressive Vectors and Merging Strategy: Toward Emotionally Expressive Dialectal Speech Synthesis</b></h3>
     </div>
     <br>
     <!-- authors -->
@@ -98,28 +98,23 @@
         </div>
     </div>
     <p style="font-size: 18px;">
-       While recent advances in text-to-speech (TTS) have led to remarkable improvements, controllably altering the subjective styles of the speech, such as generating dialect from a Mandarin prompt, remains a significant challenge. To address this, we propose Dialect Vector, which enables high-quality cross-dialect speech synthesis with improved training efficiency and model flexibility. We further extend this approach to zero-shot emotional speech synthesis, demonstrating its broad applicability to editing subjective speech features. In addition, we introduce the LoRA Merging Task Algorithm, which combines multiple task vectors to achieve controllable multi-emotion, cross-dialect speech synthesis with enhanced quality. Experimental results show that our method achieves superior performance in dialect synthesis, while revealing the challenges of multi-style speech synthesis.</p>
+        While recent advances in text-to-speech (TTS) have led to remarkable improvements, controlling expressive styles during speech synthesis remains a major challenge. In this work, we tackle the novel and challenging problem of simultaneously controlling multiple expressive styles in speech synthesis, while achieving zero-shot generalization to unseen speakers. Inspired by Task Vector, we propose <b>Expressive Vectors</p>b>, which enable high-quality synthesis of expressive styles such as Chinese dialects and emotions, while maintaining strong data efficiency with only limited training data. Furthermore, we introduce a <b>Label-conditioned LoRA Merging Strategy</b> that integrates dialect and emotion vectors to achieve controllable emotional expressive dialect synthesis without training data. Experimental results demonstrate that our method delivers superior performance in dialect synthesis and takes a first step toward addressing the challenges of synthesizing emotionally expressive dialectal speech.</p>
 
     <div style="display: flex; justify-content: center; gap: 20px;">
         <div style="text-align: center; width: 24%;">
             <img id="teaser" style="width: 100%;" src="resources/Picture1.svg">  
             <p style="font-style: italic; margin-top: 8px;">
-                (a) Build        </p>
+                (a)  Construction of the dialect vector and enhancement of F5-TTS  </p>
         </div>
         <div style="text-align: center; width: 24%;">
             <img id="teaser" style="width: 100%; background: white" src="resources/Picture2.svg">    
             <p style="font-style: italic; margin-top: 8px;">
-                (b) Enhance     </p>
+                (b) Fully merging strategy for dialectal and emotional F5-TTS   </p>
         </div>
         <div style="text-align: center; width: 24%;">
           <img id="teaser" style="width: 100%;" src="resources/Picture3.svg">  
           <p style="font-style: italic; margin-top: 8px;">
-              (c) Direct Merge         </p>
-        </div>
-        <div style="text-align: center; width: 24%;">
-            <img id="teaser" style="width: 100%; background: white" src="resources/Picture4.svg">    
-            <p style="font-style: italic; margin-top: 8px;">
-                (d) LoRA Merge   </p>
+            (c) Label-conditioned LoRA merging strategy for dialectal and emotional F5-TTS       </p>
         </div>
     </div>
 </div>
@@ -439,7 +434,274 @@
 
 
 <div class="container pt-5 mt-5 shadow p-5 mb-5 bg-white rounded">
-  <h3>Multi-style Speech Synthesis</h3>
+    <h3>Controllable Degree of Emotional Speech Synthesis</h3>
+    <h6>Synthesizing speech from a neual prompt together with the target emotion label.</h6>
+    <h6>By adjusting the enhancement coefficient β, we can control the degree of emotional expression in the synthesized speech. The following examples illustrate the effect of varying β from 0.0 to 2.5 for target  emotions:</h6>
+    <div class="table-responsive pt-3">
+        <table class="table table-hover pt-2 text-center">
+            <thead>
+                <tr>
+                    <th class="align-middle" style="min-width: 150px;">Target Text</th>
+                    <th class="align-middle" style="width: 100px;">Target Speaker</th>
+                    <th class="align-middle">Target Emotion</th>
+                    <th class="align-middle">β = 0.0</th>
+                    <th class="align-middle">β = 0.5</th>
+                    <th class="align-middle">β = 1.0</th>
+                    <th class="align-middle">β = 1.5</th>
+                    <th class="align-middle">β = 2.0</th>
+                    <th class="align-middle">β = 2.5</th>
+                </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="vertical-align: middle; text-align: center;">我也想去看可爱的熊猫。</td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <div style="width:100px; word-wrap: break-word;">我们乘船漂游了三峡，真是刺激。</div>
+                    <audio controls style="width:100px;">
+                      <source src="wav_emo/0001_000005.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;"><b>happy</b></td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <audio controls style="width:100px;">
+                        <source src="wav_emo/ESD_Happy_enhance0.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">                        
+                    <audio controls style="width:100px;">
+                        <source src="wav_emo/ESD_Happy_enhance1.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <audio controls style="width:100px;">
+                        <source src="wav_emo/ESD_Happy_enhance2.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">                        
+                    <audio controls style="width:100px;">
+                        <source src="wav_emo/ESD_Happy_enhance3.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <audio controls style="width:100px;">
+                        <source src="wav_emo/ESD_Happy_enhance4.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <audio controls style="width:100px;">
+                        <source src="wav_emo/ESD_Happy_enhance5.wav" type="audio/wav">
+                    </audio>
+                </td>
+            </tr>  
+  
+            <tr>
+                <td style="vertical-align: middle; text-align: center;">跳舞好难呀，我还正在练基本功。</td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <div style="width:100px; word-wrap: break-word;">我老家在北京。</div>
+                    <audio controls style="width:100px;">
+                      <source src="wav_emo/0002_000003.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;"><b>sad</b></td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <audio controls style="width:100px;">
+                        <source src="wav_emo/ESD_Sad_enhance0.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">                        
+                    <audio controls style="width:100px;">
+                        <source src="wav_emo/ESD_Sad_enhance1.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <audio controls style="width:100px;">
+                        <source src="wav_emo/ESD_Sad_enhance2.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">                        
+                    <audio controls style="width:100px;">
+                        <source src="wav_emo/ESD_Sad_enhance3.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <audio controls style="width:100px;">
+                        <source src="wav_emo/ESD_Sad_enhance4.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <audio controls style="width:100px;">
+                        <source src="wav_emo/ESD_Sad_enhance5.wav" type="audio/wav">
+                    </audio>
+                </td>
+            </tr>  
+            
+            <tr>
+                <td style="vertical-align: middle; text-align: center;">我们俩合不来，还经常吵架，我拿她真没办法。</td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <div style="width:100px; word-wrap: break-word;">前几天我碰见了一件有趣的事儿。</div>
+                    <audio controls style="width:100px;">
+                      <source src="wav_emo/0005_000020.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;"><b>angry</b></td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <audio controls style="width:100px;">
+                        <source src="wav_emo/ESD_Angry_enhance0.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">                        
+                    <audio controls style="width:100px;">
+                        <source src="wav_emo/ESD_Angry_enhance1.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <audio controls style="width:100px;">
+                        <source src="wav_emo/ESD_Angry_enhance2.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">                        
+                    <audio controls style="width:100px;">
+                        <source src="wav_emo/ESD_Angry_enhance3.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <audio controls style="width:100px;">
+                        <source src="wav_emo/ESD_Angry_enhance4.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <audio controls style="width:100px;">
+                        <source src="wav_emo/ESD_Angry_enhance5.wav" type="audio/wav">
+                    </audio>
+                </td>
+            </tr>  
+
+            <tr>
+                <td style="vertical-align: middle; text-align: center;">真想不到，游泳竟有如此多的好处，我下周还想来。</td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <div style="width:100px; word-wrap: break-word;">除非你打飞碟球，但这是不可能的。</div>
+                    <audio controls style="width:100px;">
+                      <source src="wav_emo/0010_000030.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;"><b>surprise</b></td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <audio controls style="width:100px;">
+                        <source src="wav_emo/ESD_Suriprise_enhance0.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">                        
+                    <audio controls style="width:100px;">
+                        <source src="wav_emo/ESD_Suriprise_enhance1.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <audio controls style="width:100px;">
+                        <source src="wav_emo/ESD_Suriprise_enhance2.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">                        
+                    <audio controls style="width:100px;">
+                        <source src="wav_emo/ESD_Suriprise_enhance3.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <audio controls style="width:100px;">
+                        <source src="wav_emo/ESD_Suriprise_enhance4.wav" type="audio/wav">
+                    </audio>
+                </td>
+                <td style="vertical-align: middle; text-align: center;">
+                    <audio controls style="width:100px;">
+                        <source src="wav_emo/ESD_Suriprise_enhance5.wav" type="audio/wav">
+                    </audio>
+                </td>
+            </tr>  
+  
+
+            </tbody>
+        </table>
+    </div>
+  </div>
+
+
+<div class="container pt-5 mt-5 shadow p-5 mb-5 bg-white rounded">
+  <h3> Emotionally Expressive Dialectal Speech Synthesis</h3>
+  <h6> <b>Note</b>: In real-world scenarios, when the same speaker expresses different emotions, the perceived timbre often changes as well, as illustrated in the following examples:</h6>
+  <div class="table-responsive pt-3">
+      <table class="table table-hover pt-2 text-center">
+          <thead>
+              <tr>
+                  <th class="align-middle" style="min-width: 150px;">Example</th>
+                  <th class="align-middle">Text</th>
+                  <th class="align-middle">Neutral</th>
+                  <th class="align-middle">Happy</th>
+                  <th class="align-middle">Sad</th>
+                  <th class="align-middle">Angry</th>
+                  <th class="align-middle">Suriprise</th>
+              </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="vertical-align: middle; text-align: center;">Male</td>
+              <td style="vertical-align: middle; text-align: center;">英国的哲学家曾经说过</td>
+              <td style="vertical-align: middle; text-align: center;">
+                  <audio controls style="width:100px;">
+                      <source src="wav_emo/0005_000002.wav" type="audio/wav">
+                  </audio>
+              </td>
+              <td style="vertical-align: middle; text-align: center;">
+                  <audio controls style="width:100px;">
+                      <source src="wav_emo/0005_000702.wav" type="audio/wav">
+                  </audio>
+              </td>
+              <td style="vertical-align: middle; text-align: center;">                        
+                  <audio controls style="width:100px;">
+                      <source src="wav_emo/0005_001052.wav" type="audio/wav">
+                  </audio>
+              </td>
+              <td style="vertical-align: middle; text-align: center;">                        
+                  <audio controls style="width:100px;">
+                      <source src="wav_emo/0005_000352.wav" type="audio/wav">
+                  </audio>
+              </td>
+              <td style="vertical-align: middle; text-align: center;">
+                  <audio controls style="width:100px;">
+                      <source src="wav_emo/0005_001402.wav" type="audio/wav">
+                  </audio>
+              </td>
+          </tr>  
+          <tr>
+              <td style="vertical-align: middle; text-align: center;">Female</td>
+              <td style="vertical-align: middle; text-align: center;">不管怎么说，主队好像志在夺魁。</td>
+              <td style="vertical-align: middle; text-align: center;">
+                  <audio controls style="width:100px;">
+                      <source src="wav_emo/0002_000004.wav" type="audio/wav">
+                  </audio>
+              </td>
+              <td style="vertical-align: middle; text-align: center;">
+                  <audio controls style="width:100px;">
+                      <source src="wav_emo/0002_000704.wav" type="audio/wav">
+                  </audio>
+              </td>
+              <td style="vertical-align: middle; text-align: center;">                        
+                  <audio controls style="width:100px;">
+                      <source src="wav_emo/0002_001054.wav" type="audio/wav">
+                  </audio>
+              </td>
+              <td style="vertical-align: middle; text-align: center;">                        
+                  <audio controls style="width:100px;">
+                      <source src="wav_emo/0002_000354.wav" type="audio/wav">
+                  </audio>
+              </td>
+              <td style="vertical-align: middle; text-align: center;">
+                  <audio controls style="width:100px;">
+                      <source src="wav_emo/0002_001404.wav" type="audio/wav">
+                  </audio>
+              </td>
+          </tr>  
+          </tbody>
+      </table>
+  </div>
   <h6>Synthesizing speech from a Mandarin prompt together with the target emotion and dialect labels.</h6>
   <div class="table-responsive pt-3">
       <table class="table table-hover pt-2 text-center">
