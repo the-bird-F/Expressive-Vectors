@@ -1,5 +1,5 @@
 <h1 align="center">
-Dialect Vector: From Efficient Cross-Dialect Synthesis to Controllable Multi-Style Speech Synthesis
+Expressive Vectors: Toward Emotionally Expressive Dialectal Speech Synthesis
 </h1>
 
 
