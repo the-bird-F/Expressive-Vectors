@@ -52,7 +52,7 @@
 <div class="container pt-5 mt-5 shadow p-5 mb-5 bg-white rounded">
     <div class="column has-text-centered">
     <!-- <h1 class="title is-1 publication-title"> <b>WeSCon:</b>  </h1> -->
-    <h3 class="title is-2 publication-title"> <b>Expressive Vectors and Merging Strategy: Toward Emotionally Expressive Dialectal Speech Synthesis</b></h3>
+    <h3 class="title is-2 publication-title"> <b>Task Vector in TTS: Toward Emotionally Expressive Dialectal Speech Synthesis</b></h3>
     </div>
     <br>
     <!-- authors -->
@@ -79,7 +79,7 @@
         </span> -->
         
         <span class="link-block">
-            <a href="https://github.com/the-bird-F/Dialect-Vector" target="_blank"
+            <a href="https://github.com/the-bird-F/Expressive-Vectors" target="_blank"
             class="external-link button is-normal is-rounded is-dark">
             <span class="icon">
                 <i class="fab fa-github"></i>
@@ -98,23 +98,26 @@
         </div>
     </div>
     <p style="font-size: 18px;">
-        While recent advances in text-to-speech (TTS) have led to remarkable improvements, controlling expressive styles during speech synthesis remains a major challenge. In this work, we tackle the novel and challenging problem of simultaneously controlling multiple expressive styles in speech synthesis, while achieving zero-shot generalization to unseen speakers. Inspired by Task Vector, we propose <b>Expressive Vectors</b>, which enable high-quality synthesis of expressive styles such as Chinese dialects and emotions, while maintaining strong data efficiency with only limited training data. Furthermore, we introduce a <b>Label-conditioned LoRA Merging Strategy</b> that integrates dialect and emotion vectors to achieve controllable emotional expressive dialect synthesis without training data. Experimental results demonstrate that our method delivers superior performance in dialect synthesis and takes a first step toward addressing the challenges of synthesizing emotionally expressive dialectal speech.</p>
+        We propose <b>Hierarchical Expressive Vector (HE-Vector)</b>, a two-stage method for Emotional Dialectal TTS. 
+        In the first stage, we construct different task vectors to model dialectal and emotional styles independently, and then enhance single-style synthesis by adjusting their weights, a method we refer to as Expressive Vector (E-Vector).
+        For the second stage, we hierarchically integrate these vectors to achieve controllable emotionally expressive dialect synthesis without requiring jointly labeled data, corresponding to Hierarchical Expressive Vector (HE-Vector). 
+        </p>
 
     <div style="display: flex; justify-content: center; gap: 20px;">
         <div style="text-align: center; width: 26%;">
             <img id="teaser" style="width: 100%;" src="resources/Picture1.svg">  
             <p style="font-style: italic; margin-top: 8px;">
-                (a)  Construction of the dialect vector and enhancement of F5-TTS  </p>
+                (a)  Construction of the E-Vector and enhancement of F5-TTS  </p>
         </div>
         <div style="text-align: center; width: 25%;">
             <img id="teaser" style="width: 100%; background: white" src="resources/Picture2.svg">    
             <p style="font-style: italic; margin-top: 8px;">
-                (b) Fully merging strategy for dialectal and emotional F5-TTS   </p>
+                (b) Fully merging strategy for dialect and emotion E-Vectors   </p>
         </div>
         <div style="text-align: center; width: 40%;">
           <img id="teaser" style="width: 100%;" src="resources/Picture3.svg">  
           <p style="font-style: italic; margin-top: 8px;">
-            (c) Label-conditioned LoRA merging strategy for dialectal and emotional F5-TTS       </p>
+            (c)  Hierarchically merging strategy for dialect and emotion E-Vectors       </p>
         </div>
     </div>
 </div>
