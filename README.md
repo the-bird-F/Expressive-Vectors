@@ -13,9 +13,9 @@ Expressive Vectors: Toward Emotionally Expressive Dialectal Speech Synthesis
 
 <p align="center">
   <span>
-    <img src="./resources/Picture1.svg" alt="Picture 1" width="150" style="margin:5px;"/>
-    <img src="./resources/Picture2.svg" alt="Picture 2" width="150" style="margin:5px;"/>
-    <img src="./resources/Picture3.svg" alt="Picture 3" width="150" style="margin:5px;"/>
+    <img src="./resources/Picture1.svg" alt="Picture 1" height="300" style="margin:5px;"/>
+    <img src="./resources/Picture2.svg" alt="Picture 2" height="300" style="margin:5px;"/>
+    <img src="./resources/Picture3.svg" alt="Picture 3" height="300" style="margin:5px;"/>
     <!-- <img src="./resources/Picture4.svg" alt="Picture 4" width="150" style="margin:5px;"/> -->
   </span>
 </p>
