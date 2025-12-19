@@ -1,6 +1,6 @@
 hydra:
   run:
-    dir: ckpts/${model.name}_${model.mel_spec.mel_spec_type}_${model.tokenizer}_${datasets.name}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: exps/${model.name}_${model.mel_spec.mel_spec_type}_${model.tokenizer}_${datasets.name}/${now:%Y-%m-%d}_${now:%H-%M-%S}
 
 datasets:
   name: Emilia_ZH_EN  # dataset name
@@ -21,6 +21,7 @@ model:
   name: F5TTS_v1_Base  # model name
   tokenizer: pinyin  # tokenizer type
   tokenizer_path: null  # if 'custom' tokenizer, define the path want to use (should be vocab.txt)
+  tokenized: False  # whether the dataset is already tokenized
   backbone: DiT
   arch:
     dim: 1024
@@ -48,8 +49,10 @@ model:
 
 ckpts:
   logger: wandb  # wandb | tensorboard | null
+  wandb_project: F5TTS # wandb project name
+  wandb_run_name: ${model.name}_${model.mel_spec.mel_spec_type}_${model.tokenizer}_${datasets.name}  # wandb run name
   log_samples: True  # infer random sample per save checkpoint. wip, normal to fail with extra long samples
-  save_per_updates: 50000  # save checkpoint per updates
+  save_per_updates: 10000  # save samples and checkpoint per updates
   keep_last_n_checkpoints: -1  # -1 to keep all, 0 to not save intermediate, > 0 to keep last N checkpoints
   last_per_updates: 5000  # save last checkpoint per updates
-  save_dir: ckpts/${model.name}_${model.mel_spec.mel_spec_type}_${model.tokenizer}_${datasets.name}
+  save_dir: ${hydra:run.dir} # checkpoint save dir

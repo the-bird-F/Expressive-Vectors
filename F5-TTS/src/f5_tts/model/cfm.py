@@ -50,6 +50,7 @@ class CFM(nn.Module):
         frac_lengths_mask: tuple[float, float] = (0.7, 1.0),
         vocab_char_map: dict[str:int] | None = None,
         tokenized: bool = False,
+        tokenizer: str | None = None,
     ):
         super().__init__()
 
@@ -87,7 +88,7 @@ class CFM(nn.Module):
     def sample(
         self,
         cond: float["b n d"] | float["b nw"],
-        text: int["b nt"] | list[str],
+        text: int["b nt"] | list[str] | torch.Tensor,
         duration: int | int["b"],
         *,
         lens: int["b"] | None = None,
@@ -122,10 +123,10 @@ class CFM(nn.Module):
 
         if isinstance(text, list):
             if self.tokenized:
+                text = idx_to_tensor(text).to(device)
+            else:
                 assert exists(self.vocab_char_map), "vocab_char_map missing"
                 text = list_str_to_idx(text, self.vocab_char_map).to(device)
-            else:
-                text = idx_to_tensor(text).to(device)
             assert text.shape[0] == batch
 
         # duration

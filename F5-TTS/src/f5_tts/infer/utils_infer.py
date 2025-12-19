@@ -266,6 +266,7 @@ def load_model(
             method=ode_method,
         ),
         vocab_char_map=vocab_char_map,
+        tokenizer=tokenizer
     ).to(device)
 
     dtype = torch.float32 if mel_spec_type == "bigvgan" else None
@@ -396,6 +397,7 @@ def infer_process(
     speed=speed,
     fix_duration=fix_duration,
     device=device,
+    lora_idx=None,
 ):
     # Split the input text into batches
     audio, sr = torchaudio.load(ref_audio)
@@ -423,6 +425,7 @@ def infer_process(
             speed=speed,
             fix_duration=fix_duration,
             device=device,
+            lora_idx=lora_idx,
         )
     )
 
@@ -448,6 +451,7 @@ def infer_batch_process(
     device=None,
     streaming=False,
     chunk_size=2048,
+    lora_idx=None,
 ):
     audio, sr = ref_audio
     if audio.shape[0] > 1:
@@ -494,6 +498,7 @@ def infer_batch_process(
                 steps=nfe_step,
                 cfg_strength=cfg_strength,
                 sway_sampling_coef=sway_sampling_coef,
+                lora_idx=lora_idx,
             )
             del _
 

@@ -45,6 +45,7 @@ class TextEmbedding(nn.Module):
         use_lora: bool = False,
         lora_rank: int | None = None,
         lora_feature_dim: int | None = None,
+        lora_alpha: float = 1.0,
     ):
         super().__init__()
         self.text_embed = nn.Embedding(text_num_embeds + 1, text_dim)  # use 0 as filler token
@@ -59,7 +60,17 @@ class TextEmbedding(nn.Module):
             self.precompute_max_pos = 8192  # 8192 is ~87.38s of 24khz audio; 4096 is ~43.69s of 24khz audio
             self.register_buffer("freqs_cis", precompute_freqs_cis(text_dim, self.precompute_max_pos), persistent=False)
             self.text_blocks = nn.Sequential(
-                *[ConvNeXtV2Block(text_dim, text_dim * conv_mult, use_lora=use_lora, lora_rank=lora_rank, lora_feature_dim=lora_feature_dim) for _ in range(conv_layers)]
+                *[
+                    ConvNeXtV2Block(
+                        text_dim, 
+                        text_dim * conv_mult, 
+                        use_lora=use_lora, 
+                        lora_rank=lora_rank, 
+                        lora_feature_dim=lora_feature_dim,
+                        lora_alpha=lora_alpha,
+                    ) 
+                    for _ in range(conv_layers)
+                ]
             )
         else:
             self.extra_modeling = False
@@ -141,10 +152,17 @@ class InputEmbedding(nn.Module):
         use_lora: bool = False,
         lora_rank: int | None = None,
         lora_feature_dim: int | None = None,
+        lora_alpha: float = 1.0,
     ):
         super().__init__()
         self.proj = nn.Linear(mel_dim * 2 + text_dim, out_dim)
-        self.conv_pos_embed = ConvPositionEmbedding(dim=out_dim, use_lora=use_lora, lora_rank=lora_rank, lora_feature_dim=lora_feature_dim)
+        self.conv_pos_embed = ConvPositionEmbedding(
+            dim=out_dim, 
+            use_lora=use_lora, 
+            lora_rank=lora_rank, 
+            lora_feature_dim=lora_feature_dim,
+            lora_alpha=lora_alpha,
+        )
         self.use_lora = use_lora
 
     def forward(
@@ -193,17 +211,25 @@ class DiT(nn.Module):
         use_lora: bool = False,
         lora_rank: int | None = None,
         lora_feature_dim: list | None = None,
+        lora_alpha: float = 1.0,
     ):
         super().__init__()
 
         self.use_lora = use_lora
         if use_lora:
-            self.lora_proj_out = LoRALinear(dim, mel_dim, lora_rank=lora_rank, lora_feature_dim=lora_feature_dim[0] if lora_feature_dim else None)
+            self.lora_proj_out = LoRALinear(
+                dim, 
+                mel_dim, 
+                lora_rank=lora_rank, 
+                lora_feature_dim=lora_feature_dim[0] if lora_feature_dim else None, 
+                lora_alpha=lora_alpha
+            )
         self.time_embed = TimestepEmbedding(
             dim, 
             use_lora=use_lora, 
             lora_rank=lora_rank, 
-            lora_feature_dim=lora_feature_dim[0] if lora_feature_dim else None
+            lora_feature_dim=lora_feature_dim[0] if lora_feature_dim else None,
+            lora_alpha=lora_alpha
         )
         if text_dim is None:
             text_dim = mel_dim
@@ -216,6 +242,7 @@ class DiT(nn.Module):
             use_lora=use_lora,
             lora_rank=lora_rank,
             lora_feature_dim=lora_feature_dim[0] if lora_feature_dim else None,
+            lora_alpha=lora_alpha,
         )
         self.text_cond, self.text_uncond = None, None  # text cache
         self.input_embed = InputEmbedding(
@@ -225,6 +252,7 @@ class DiT(nn.Module):
             use_lora=use_lora,
             lora_rank=lora_rank,
             lora_feature_dim=lora_feature_dim[0] if lora_feature_dim else None,
+            lora_alpha=lora_alpha,
         )
 
         self.rotary_embed = RotaryEmbedding(dim_head)
@@ -248,6 +276,7 @@ class DiT(nn.Module):
                     use_lora=use_lora,
                     lora_rank=lora_rank,
                     lora_feature_dim=lora_feature_dim[self.lora_map[i]] if lora_feature_dim else None,
+                    lora_alpha=lora_alpha,
                 )
                 for i in range(depth)
             ]
@@ -259,6 +288,7 @@ class DiT(nn.Module):
             use_lora=use_lora, 
             lora_rank=lora_rank,
             lora_feature_dim=lora_feature_dim[0] if lora_feature_dim else None,
+            lora_alpha=lora_alpha,
         )  # final modulation
         self.proj_out = nn.Linear(dim, mel_dim)
 

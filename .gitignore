@@ -1,3 +1,8 @@
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+
 F5-TTS/data/**
-F5-TTS/ckpts/**
+F5-TTS/exps/**
 F5-TTS/wandb/**

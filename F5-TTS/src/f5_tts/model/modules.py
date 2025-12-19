@@ -176,7 +176,8 @@ class ConvPositionEmbedding(nn.Module):
         groups=16, 
         use_lora: bool = False, 
         lora_rank: int | None = None, 
-        lora_feature_dim: int | None = None
+        lora_feature_dim: int | None = None,
+        lora_alpha: float = 1.0,
     ):
         super().__init__()
         assert kernel_size % 2 != 0
@@ -192,8 +193,26 @@ class ConvPositionEmbedding(nn.Module):
         if use_lora:
             assert lora_rank is not None
             self.lora_conv1d = nn.Sequential(
-                LoRAConv1d(dim, dim, kernel_size, lora_rank=lora_rank, lora_feature_dim=lora_feature_dim, groups=groups, padding=kernel_size // 2),
-                LoRAConv1d(dim, dim, kernel_size, lora_rank=lora_rank, lora_feature_dim=lora_feature_dim, groups=groups, padding=kernel_size // 2),
+                LoRAConv1d(
+                    dim, 
+                    dim, 
+                    kernel_size, 
+                    lora_rank=lora_rank, 
+                    lora_feature_dim=lora_feature_dim, 
+                    lora_alpha=lora_alpha,
+                    groups=groups, 
+                    padding=kernel_size // 2
+                ),
+                LoRAConv1d(
+                    dim, 
+                    dim, 
+                    kernel_size, 
+                    lora_rank=lora_rank, 
+                    lora_feature_dim=lora_feature_dim, 
+                    lora_alpha=lora_alpha,
+                    groups=groups, 
+                    padding=kernel_size // 2
+                )
             )
             self.lora_map = {0: 0, 2: 1}  # map from conv1d idx to lora idx
 
@@ -275,6 +294,7 @@ class ConvNeXtV2Block(nn.Module):
         use_lora: bool = False,
         lora_rank: int | None = None,
         lora_feature_dim: int | None = None,
+        lora_alpha: float = 1.0,
     ):
         super().__init__()
         padding = (dilation * (7 - 1)) // 2
@@ -290,8 +310,20 @@ class ConvNeXtV2Block(nn.Module):
         self.use_lora = use_lora
         if use_lora:
             assert lora_rank is not None
-            self.lora_conv1 = LoRALinear(dim, intermediate_dim, lora_rank, lora_feature_dim)
-            self.lora_conv2 = LoRALinear(intermediate_dim, dim, lora_rank, lora_feature_dim)
+            self.lora_conv1 = LoRALinear(
+                dim, 
+                intermediate_dim, 
+                lora_rank, 
+                lora_feature_dim, 
+                lora_alpha=lora_alpha,
+            )
+            self.lora_conv2 = LoRALinear(
+                intermediate_dim, 
+                dim, 
+                lora_rank, 
+                lora_feature_dim,
+                lora_alpha=lora_alpha,
+            )
         
     def forward(self, x: torch.Tensor, lora_idx: torch.Tensor | int | None) -> torch.Tensor:
         residual = x
@@ -347,7 +379,8 @@ class AdaLayerNorm(nn.Module):
         dim, 
         use_lora: bool = False,
         lora_rank: int | None = None,
-        lora_feature_dim: int | None = None
+        lora_feature_dim: int | None = None,
+        lora_alpha: float = 1.0,
     ):
         super().__init__()
 
@@ -356,7 +389,13 @@ class AdaLayerNorm(nn.Module):
         self.use_lora = use_lora
         if use_lora:
             assert lora_rank is not None
-            self.lora_linear = LoRALinear(dim, dim * 6, lora_rank, lora_feature_dim)
+            self.lora_linear = LoRALinear(
+                dim, 
+                dim * 6, 
+                lora_rank, 
+                lora_feature_dim, 
+                lora_alpha=lora_alpha
+            )
 
         self.norm = nn.LayerNorm(dim, elementwise_affine=False, eps=1e-6)
 
@@ -382,7 +421,8 @@ class AdaLayerNorm_Final(nn.Module):
         dim,
         use_lora: bool = False,
         lora_rank: int | None = None,
-        lora_feature_dim: int | None = None
+        lora_feature_dim: int | None = None,
+        lora_alpha: float = 1.0,
     ):
         super().__init__()
 
@@ -391,7 +431,13 @@ class AdaLayerNorm_Final(nn.Module):
         self.use_lora = use_lora
         if use_lora:
             assert lora_rank is not None
-            self.lora_linear = LoRALinear(dim, dim * 2, lora_rank, lora_feature_dim)
+            self.lora_linear = LoRALinear(
+                dim, 
+                dim * 2, 
+                lora_rank, 
+                lora_feature_dim, 
+                lora_alpha=lora_alpha
+            )
 
         self.norm = nn.LayerNorm(dim, elementwise_affine=False, eps=1e-6)
 
@@ -420,7 +466,8 @@ class FeedForward(nn.Module):
         approximate: str = "none",
         use_lora: bool = False,
         lora_rank: int | None = None,
-        lora_feature_dim: int | None = None
+        lora_feature_dim: int | None = None,
+        lora_alpha: float = 1.0,
     ):
         super().__init__()
         inner_dim = int(dim * mult)
@@ -432,8 +479,20 @@ class FeedForward(nn.Module):
 
         self.use_lora = use_lora
         if use_lora:
-            self.lora_project_in = LoRALinear(dim, inner_dim, lora_rank, lora_feature_dim)
-            self.lora_project_out = LoRALinear(inner_dim, dim_out, lora_rank, lora_feature_dim)
+            self.lora_project_in = LoRALinear(
+                dim, 
+                inner_dim, 
+                lora_rank, 
+                lora_feature_dim, 
+                lora_alpha=lora_alpha
+            )
+            self.lora_project_out = LoRALinear(
+                inner_dim, 
+                dim_out, 
+                lora_rank, 
+                lora_feature_dim, 
+                lora_alpha=lora_alpha
+            )
 
     def forward(self, x, lora_idx: torch.Tensor | int | None = None):
         if self.use_lora:
@@ -465,7 +524,8 @@ class Attention(nn.Module):
         qk_norm: Optional[str] = None,
         use_lora: bool = False,
         lora_rank: int | None = None,
-        lora_feature_dim: int | None = None
+        lora_feature_dim: int | None = None,
+        lora_alpha: float = 1.0,
     ):
         super().__init__()
 
@@ -490,9 +550,27 @@ class Attention(nn.Module):
 
         if use_lora:
             assert lora_rank is not None
-            self.lora_q = LoRALinear(dim, self.inner_dim, lora_rank, lora_feature_dim)
-            self.lora_k = LoRALinear(dim, self.inner_dim, lora_rank, lora_feature_dim)
-            self.lora_v = LoRALinear(dim, self.inner_dim, lora_rank, lora_feature_dim)
+            self.lora_q = LoRALinear(
+                dim, 
+                self.inner_dim, 
+                lora_rank, 
+                lora_feature_dim,
+                lora_alpha=lora_alpha,
+            )
+            self.lora_k = LoRALinear(
+                dim, 
+                self.inner_dim, 
+                lora_rank, 
+                lora_feature_dim,
+                lora_alpha=lora_alpha,
+            )
+            self.lora_v = LoRALinear(
+                dim, 
+                self.inner_dim, 
+                lora_rank, 
+                lora_feature_dim,
+                lora_alpha=lora_alpha,
+            )
         if qk_norm is None:
             self.q_norm = None
             self.k_norm = None
@@ -507,9 +585,27 @@ class Attention(nn.Module):
             self.to_k_c = nn.Linear(context_dim, self.inner_dim)
             self.to_v_c = nn.Linear(context_dim, self.inner_dim)
             if use_lora:
-                self.lora_q_c = LoRALinear(context_dim, self.inner_dim, lora_rank, lora_feature_dim)
-                self.lora_k_c = LoRALinear(context_dim, self.inner_dim, lora_rank, lora_feature_dim)
-                self.lora_v_c = LoRALinear(context_dim, self.inner_dim, lora_rank, lora_feature_dim)
+                self.lora_q_c = LoRALinear(
+                    context_dim, 
+                    self.inner_dim, 
+                    lora_rank, 
+                    lora_feature_dim,
+                    lora_alpha=lora_alpha,
+                )
+                self.lora_k_c = LoRALinear(
+                    context_dim, 
+                    self.inner_dim, 
+                    lora_rank, 
+                    lora_feature_dim,
+                    lora_alpha=lora_alpha,
+                )
+                self.lora_v_c = LoRALinear(
+                    context_dim, 
+                    self.inner_dim, 
+                    lora_rank, 
+                    lora_feature_dim,
+                    lora_alpha=lora_alpha,
+                )
             if qk_norm is None:
                 self.c_q_norm = None
                 self.c_k_norm = None
@@ -521,7 +617,13 @@ class Attention(nn.Module):
         self.to_out.append(nn.Linear(self.inner_dim, dim))
         self.to_out.append(nn.Dropout(dropout))
         if use_lora:
-            self.lora_to_out = LoRALinear(self.inner_dim, dim, lora_rank, lora_feature_dim)
+            self.lora_to_out = LoRALinear(
+                self.inner_dim, 
+                dim, 
+                lora_rank, 
+                lora_feature_dim,
+                lora_alpha=lora_alpha,
+            )
 
         if self.context_dim is not None and not self.context_pre_only:
             self.to_out_c = nn.Linear(self.inner_dim, context_dim)
@@ -791,11 +893,18 @@ class DiTBlock(nn.Module):
         attn_mask_enabled=True,
         use_lora: bool = False,
         lora_rank: int | None = None,
-        lora_feature_dim: int | None = None
+        lora_feature_dim: int | None = None,
+        lora_alpha: float = 1.0,
     ):
         super().__init__()
 
-        self.attn_norm = AdaLayerNorm(dim, use_lora=use_lora, lora_rank=lora_rank, lora_feature_dim=lora_feature_dim)
+        self.attn_norm = AdaLayerNorm(
+            dim, 
+            use_lora=use_lora, 
+            lora_rank=lora_rank, 
+            lora_feature_dim=lora_feature_dim,
+            lora_alpha=lora_alpha
+        )
         self.attn = Attention(
             processor=AttnProcessor(
                 pe_attn_head=pe_attn_head,
@@ -809,11 +918,21 @@ class DiTBlock(nn.Module):
             qk_norm=qk_norm,
             use_lora=use_lora,
             lora_rank=lora_rank,
-            lora_feature_dim=lora_feature_dim
+            lora_feature_dim=lora_feature_dim,
+            lora_alpha=lora_alpha,
         )
 
         self.ff_norm = nn.LayerNorm(dim, elementwise_affine=False, eps=1e-6)
-        self.ff = FeedForward(dim=dim, mult=ff_mult, dropout=dropout, approximate="tanh", use_lora=use_lora, lora_rank=lora_rank, lora_feature_dim=lora_feature_dim)
+        self.ff = FeedForward(
+            dim=dim, 
+            mult=ff_mult, 
+            dropout=dropout, 
+            approximate="tanh", 
+            use_lora=use_lora, 
+            lora_rank=lora_rank, 
+            lora_feature_dim=lora_feature_dim,
+            lora_alpha=lora_alpha,
+        )
 
     def forward(self, x, t, mask=None, rope=None, lora_idx: torch.Tensor | int | None = None):  # x: noised input, t: time embedding
         # pre-norm & modulation for attention input
@@ -857,7 +976,8 @@ class MMDiTBlock(nn.Module):
         qk_norm=None,
         use_lora: bool = False,
         lora_rank: int | None = None,
-        lora_feature_dim: int | None = None
+        lora_feature_dim: int | None = None,
+        lora_alpha: float = 1.0,
     ):
         super().__init__()
         if context_dim is None:
@@ -865,10 +985,28 @@ class MMDiTBlock(nn.Module):
         self.context_pre_only = context_pre_only
 
         if context_pre_only:
-            self.attn_norm_c = AdaLayerNorm_Final(context_dim, use_lora=use_lora, lora_rank=lora_rank, lora_feature_dim=lora_feature_dim)
+            self.attn_norm_c = AdaLayerNorm_Final(
+                context_dim, 
+                use_lora=use_lora, 
+                lora_rank=lora_rank, 
+                lora_feature_dim=lora_feature_dim,
+                lora_alpha=lora_alpha,
+            )
         else: 
-            self.attn_norm_c = AdaLayerNorm(context_dim, use_lora=use_lora, lora_rank=lora_rank, lora_feature_dim=lora_feature_dim)
-        self.attn_norm_x = AdaLayerNorm(dim, use_lora=use_lora, lora_rank=lora_rank, lora_feature_dim=lora_feature_dim)
+            self.attn_norm_c = AdaLayerNorm(
+                context_dim, 
+                use_lora=use_lora, 
+                lora_rank=lora_rank, 
+                lora_feature_dim=lora_feature_dim,
+                lora_alpha=lora_alpha,
+            )
+        self.attn_norm_x = AdaLayerNorm(
+            dim, 
+            use_lora=use_lora, 
+            lora_rank=lora_rank, 
+            lora_feature_dim=lora_feature_dim,
+            lora_alpha=lora_alpha,
+        )
         self.attn = Attention(
             processor=JointAttnProcessor(),
             dim=dim,
@@ -880,17 +1018,36 @@ class MMDiTBlock(nn.Module):
             qk_norm=qk_norm,
             use_lora=use_lora,
             lora_rank=lora_rank,
-            lora_feature_dim=lora_feature_dim
+            lora_feature_dim=lora_feature_dim,
+            lora_alpha=lora_alpha,
         )
 
         if not context_pre_only:
             self.ff_norm_c = nn.LayerNorm(context_dim, elementwise_affine=False, eps=1e-6)
-            self.ff_c = FeedForward(dim=context_dim, mult=ff_mult, dropout=dropout, approximate="tanh", use_lora=use_lora, lora_rank=lora_rank, lora_feature_dim=lora_feature_dim)
+            self.ff_c = FeedForward(
+                dim=context_dim, 
+                mult=ff_mult, 
+                dropout=dropout, 
+                approximate="tanh", 
+                use_lora=use_lora, 
+                lora_rank=lora_rank, 
+                lora_feature_dim=lora_feature_dim,
+                lora_alpha=lora_alpha,
+            )
         else:
             self.ff_norm_c = None
             self.ff_c = None
         self.ff_norm_x = nn.LayerNorm(dim, elementwise_affine=False, eps=1e-6)
-        self.ff_x = FeedForward(dim=dim, mult=ff_mult, dropout=dropout, approximate="tanh", use_lora=use_lora, lora_rank=lora_rank, lora_feature_dim=lora_feature_dim)
+        self.ff_x = FeedForward(
+            dim=dim, 
+            mult=ff_mult, 
+            dropout=dropout, 
+            approximate="tanh", 
+            use_lora=use_lora, 
+            lora_rank=lora_rank, 
+            lora_feature_dim=lora_feature_dim,
+            lora_alpha=lora_alpha,
+        )
 
     def forward(self, x, c, t, mask=None, rope=None, c_rope=None, lora_idx: torch.Tensor | int | None = None):  # x: noised input, c: context, t: time embedding
         # pre-norm & modulation for attention input
@@ -933,7 +1090,8 @@ class TimestepEmbedding(nn.Module):
         freq_embed_dim=256, 
         use_lora: bool = False,
         lora_rank: int | None = None,
-        lora_feature_dim: int | None = None
+        lora_feature_dim: int | None = None,
+        lora_alpha: float = 1.0,
     ):
         super().__init__()
         self.time_embed = SinusPositionEmbedding(freq_embed_dim)
@@ -943,8 +1101,8 @@ class TimestepEmbedding(nn.Module):
         if use_lora:
             assert lora_rank is not None
             self.lora_mlp = nn.ModuleList([
-                LoRALinear(freq_embed_dim, dim, lora_rank, lora_feature_dim),
-                LoRALinear(dim, dim, lora_rank, lora_feature_dim)
+                LoRALinear(freq_embed_dim, dim, lora_rank, lora_feature_dim, lora_alpha=lora_alpha),
+                LoRALinear(dim, dim, lora_rank, lora_feature_dim, lora_alpha=lora_alpha)
             ])
             self.lora_map = {0: 0, 2: 1} # mapping from time_mlp layer idx to lora_mlp layer idx
     def forward(self, timestep: float["b"], lora_idx: torch.Tensor | int | None = None):
@@ -966,12 +1124,14 @@ class LoRALinear(nn.Module):
         out_features: int, 
         lora_rank: int = 64, 
         lora_feature_dim: int | None = None, 
+        lora_alpha: float = 1.0,
         bias: bool = True
     ):
         super().__init__()
         self.in_features = in_features
         self.out_features = out_features
         self.lora_feature_dim = lora_feature_dim
+        self.lora_alpha = lora_alpha
 
         if lora_feature_dim is None:
             self.encoders = nn.Linear(in_features, lora_rank, bias=False)
@@ -1033,7 +1193,7 @@ class LoRALinear(nn.Module):
                     out.append(out_tensor)
                 out = torch.stack(out, dim=0).sum(dim=0)
 
-        return out
+        return out * self.lora_alpha
 
 class LoRAEmbedding(nn.Module):
     def __init__(
@@ -1042,12 +1202,14 @@ class LoRAEmbedding(nn.Module):
         embedding_dim: int, 
         lora_rank: int = 64,
         lora_feature_dim: int | None = None,
+        lora_alpha: float = 1.0,
         bias = False,
     ):
         super().__init__()
         self.num_embeddings = num_embeddings
         self.embedding_dim = embedding_dim
         self.lora_feature_dim = lora_feature_dim
+        self.lora_alpha = lora_alpha
 
         if lora_feature_dim is None:
             self.encoders = nn.Embedding(num_embeddings, lora_rank)
@@ -1109,7 +1271,7 @@ class LoRAEmbedding(nn.Module):
                     out.append(out_tensor)
                 out = torch.stack(out, dim=0).sum(dim=0)
 
-        return out
+        return out * self.lora_alpha
 
 class LoRAConv1d(nn.Module):
     def __init__(
@@ -1119,6 +1281,7 @@ class LoRAConv1d(nn.Module):
         kernel_size: int, 
         lora_rank: int = 64, 
         lora_feature_dim: int | None = None, 
+        lora_alpha: float = 1.0,
         bias: bool = True,
         **kwargs
     ):
@@ -1127,6 +1290,7 @@ class LoRAConv1d(nn.Module):
         self.out_channels = out_channels
         self.kernel_size = kernel_size
         self.lora_feature_dim = lora_feature_dim
+        self.lora_alpha = lora_alpha
 
         if lora_feature_dim is None:
             self.encoders = nn.Conv1d(in_channels, lora_rank, kernel_size, **kwargs)
@@ -1188,4 +1352,4 @@ class LoRAConv1d(nn.Module):
                     out.append(out_tensor)
                 out = torch.stack(out, dim=0).sum(dim=0)
                 
-        return out
+        return out * self.lora_alpha
