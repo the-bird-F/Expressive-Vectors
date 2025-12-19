@@ -1,0 +1,18 @@
+accelerate launch -m f5_tts.train.finetune_cli \
+    --finetune \
+    --exp_name F5TTS_v1_LoRA \
+    --epochs 200 \
+    --pretrain ./ckpts/F5TTS_v1_Base/model_1250000.safetensors \
+    --logger wandb \
+    --local_vocoder \
+    --vocoder_path ./src/third_party/vocos \
+    --dataset_name Speech_ESD \
+    --tokenized \
+    --tokenizer pinyin \
+    --last_per_update 2000 \
+    --save_per_update 10000 \
+    --log_samples \
+    --batch_size_per_gpu 16000 \
+    --use_lora \
+    --lora_rank 64 \
+    --lora_feature_dim 11 5 \
