@@ -4,6 +4,7 @@ from html import parser
 import os
 import re
 import json
+from weakref import ref
 import hydra
 import logging
 from datetime import datetime
@@ -38,144 +39,30 @@ logging.basicConfig(
     level=logging.INFO,
 )
 
-parser = argparse.ArgumentParser(description="F5-TTS Inference CLI")
-
-parser.add_argument(
-    "--config-path",
-    type=str,
-    required=True,
-    help="path to the config file",
-)
-parser.add_argument(
-    "--ckpt_file",
-    type=str,
-    default=None,
-    help="checkpoint file path for the TTS model",
-)
-parser.add_argument(
-    "--vocab_file",
-    type=str,
-    default=None,
-    help="vocab file path for the tokenizer",
-)
-parser.add_argument(
-    "--ref_audio",
-    type=str,
-    required=True,
-    help="path to reference audio file",
-)
-parser.add_argument(
-    "--ref_text",
-    type=str,
-    required=True,
-    help="reference text corresponding to the reference audio",
-)
-parser.add_argument(
-    "--gen_text",
-    type=str,
-    required=True,
-    help="text to be synthesized",
-)
-parser.add_argument(
-    "--lora_label",
-    type=str,
-    nargs="+",
-    default=None,
-    help="list of lora labels corresponding to each lora dimension",
-)
-parser.add_argument(
-    "--lora_mapping_file",
-    type=str,
-    default=None,
-    help="path to lora mapping json file",
-)
-parser.add_argument(
-    "--lora_alpha",
-    type=float,
-    default=1.0,
-    help="scaling factor for LoRA modules",
-)
-parser.add_argument(
-    "--target_rms",
-    type=float,
-    default=target_rms,
-    help=f"Target output speech loudness normalization value, default {target_rms}",
-)
-parser.add_argument(
-    "--cross_fade_duration",
-    type=float,
-    default=cross_fade_duration,
-    help=f"Duration of cross-fade between audio segments in seconds, default {cross_fade_duration}",
-)
-parser.add_argument(
-    "--nfe_step",
-    type=int,
-    default=nfe_step,
-    help=f"The number of function evaluation (denoising steps), default {nfe_step}",
-)
-parser.add_argument(
-    "--cfg_strength",
-    type=float,
-    default=cfg_strength,
-    help=f"Classifier-free guidance strength, default {cfg_strength}",
-)
-parser.add_argument(
-    "--sway_sampling_coef",
-    type=float,
-    default=sway_sampling_coef,
-    help=f"Sway Sampling coefficient, default {sway_sampling_coef}",
-)
-parser.add_argument(
-    "--speed",
-    type=float,
-    default=speed,
-    help=f"The speed of the generated audio, default {speed}",
-)
-parser.add_argument(
-    "--fix_duration",
-    type=float,
-    default=fix_duration,
-    help=f"Fix the total duration (ref and gen audios) in seconds, default {fix_duration}",
-)
-parser.add_argument(
-    "--device",
-    type=str,
-    default=device,
-    help="Specify the device to run on",
-)
-args = parser.parse_args()
 
 # inference process
 
-def main():
-    config = OmegaConf.load(args.config_path)
-    model = config.model.backbone
+@hydra.main(config_path=None, config_name=None, version_base="1.3")
+def main(config):
     save_dir = config.ckpts.save_dir
+    model = config.model.backbone
 
-    if args.ckpt_file is None:
-        ckpt_file = os.path.join(save_dir, "ckpts/model_last.pt")
-    else:
-        ckpt_file = args.ckpt_file
+    ckpt_file = config.gen.get("ckpt_file", os.path.join(save_dir, "ckpts/model_last.pt"))
+    vocab_file = config.model.get("vocab_file", os.path.join(save_dir, "vocab.txt"))
 
-    if args.vocab_file is None:
-        vocab_file = os.path.join(save_dir, "vocab.txt")
-    else:
-        vocab_file = args.vocab_file
-
-
-    ref_audio = args.ref_audio
-    ref_text = args.ref_text
-    gen_text = args.gen_text
+    ref_audio = config.gen.ref_audio
+    ref_text = config.gen.ref_text
+    gen_text = config.gen.gen_text
 
     use_lora = config.model.arch.get("use_lora", False)
-    output_dir = os.path.join(save_dir, "examples")
-    if use_lora:
-        lora_label = args.lora_label
-        output_file = f"{'_'.join(lora_label)}_{args.lora_alpha}.wav"
-        if args.lora_mapping_file is None:
-            lora_mapping_file = os.path.join(save_dir, "lora_mapping.json")
+    lora_label = config.gen.get("lora_label", None)
+    if use_lora and lora_label is not None:
+        lora_alpha = config.model.arch.get("lora_alpha", None)
+        if lora_alpha is None:
+            output_file = f"{'_'.join(lora_label)}.wav"
         else:
-            lora_mapping_file = args.lora_mapping_file
+            output_file = f"{'_'.join(lora_label)}_alpha_{lora_alpha}.wav"
+        lora_mapping_file = config.gen.get("lora_mapping_file", os.path.join(save_dir, "lora_mapping.json"))
         lora_map = json.load(open(lora_mapping_file, "r", encoding="utf-8"))
         lora_idx = []
         for i, (label_name, label_map) in enumerate(lora_map.items()):
@@ -185,33 +72,31 @@ def main():
         output_file = "output.wav"
         lora_idx = None
 
-    target_rms = args.target_rms
-    cross_fade_duration = args.cross_fade_duration
-    nfe_step = args.nfe_step
-    cfg_strength = args.cfg_strength
-    sway_sampling_coef = args.sway_sampling_coef
-    speed = args.speed
-    fix_duration = args.fix_duration
-    device = args.device
-
+    cfg_target_rms = config.gen.get("target_rms", target_rms)
+    cfg_cross_fade_duration = config.gen.get("cross_fade_duration", cross_fade_duration)
+    cfg_nfe_step = config.gen.get("nfe_step", nfe_step)
+    cfg_cfg_strength = config.gen.get("cfg_strength", cfg_strength)
+    cfg_sway_sampling_coef = config.gen.get("sway_sampling_coef", sway_sampling_coef)
+    cfg_speed = config.gen.get("speed", speed)
+    cfg_fix_duration = config.gen.get("fix_duration", fix_duration)
+    cfg_device = config.gen.get("device", device)
 
     # output path
 
+    output_dir = config.gen.get("output_dir", os.path.join(save_dir, "examples"))
     wave_path = Path(output_dir) / output_file
 
     vocoder = load_vocoder(
         vocoder_name=config.model.mel_spec.mel_spec_type, 
         is_local=config.model.vocoder.is_local, 
         local_path=config.model.vocoder.local_path, 
-        device=device
+        device=cfg_device
     )
 
     # load TTS model
 
     model_cls = get_class(f"f5_tts.model.{model}")
     model_arc = config.model.arch
-    if use_lora:
-        model_arc["lora_alpha"] = args.lora_alpha
 
     print(f"Using {model}...")
     ema_model = load_model(
@@ -220,7 +105,7 @@ def main():
         ckpt_file, 
         mel_spec_type=config.model.mel_spec.mel_spec_type, 
         vocab_file=vocab_file, 
-        device=device
+        device=cfg_device
     )
 
     main_voice = {"ref_audio": ref_audio, "ref_text": ref_text}
@@ -256,7 +141,6 @@ def main():
         text = re.sub(reg2, "", text)
         ref_audio_ = voices[voice]["ref_audio"]
         ref_text_ = voices[voice]["ref_text"]
-        local_speed = voices[voice].get("speed", speed)
         gen_text_ = text.strip()
         print(f"Voice: {voice}")
         audio_segment, final_sample_rate, spectrogram = infer_process(
@@ -266,14 +150,14 @@ def main():
             ema_model,
             vocoder,
             mel_spec_type=config.model.mel_spec.mel_spec_type,
-            target_rms=target_rms,
-            cross_fade_duration=cross_fade_duration,
-            nfe_step=nfe_step,
-            cfg_strength=cfg_strength,
-            sway_sampling_coef=sway_sampling_coef,
-            speed=local_speed,
-            fix_duration=fix_duration,
-            device=device,
+            target_rms=cfg_target_rms,
+            cross_fade_duration=cfg_cross_fade_duration,
+            nfe_step=cfg_nfe_step,
+            cfg_strength=cfg_cfg_strength,
+            sway_sampling_coef=cfg_sway_sampling_coef,
+            speed=cfg_speed,
+            fix_duration=cfg_fix_duration,
+            device=cfg_device,
             lora_idx=lora_idx,
         )
         generated_audio_segments.append(audio_segment)

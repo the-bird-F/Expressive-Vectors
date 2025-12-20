@@ -420,8 +420,10 @@ def collate_fn(batch, use_lora: bool = False):
     text = [item["text"] for item in batch]
     text_lengths = torch.LongTensor([len(item) for item in text])
 
-    if use_lora:
+    if use_lora and "lora_idx" in batch[0]:
         lora_idx = torch.LongTensor([item["lora_idx"] for item in batch])
+        if lora_idx.dim() == 1:
+            lora_idx.unsqueeze_(1)
         if torch.all(lora_idx == lora_idx[0], dim=1).all():
             lora_idx = lora_idx[0]
         else:

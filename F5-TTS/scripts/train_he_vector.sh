@@ -1,3 +1,5 @@
+#!/bin/bash
+
 accelerate launch -m f5_tts.train.finetune_cli \
     datasets.name=Speech_ESD \
     datasets.batch_size_per_gpu=16000 \

@@ -20,8 +20,6 @@ logging.basicConfig(
 
 def clean_config(d):
     clean_cfg = OmegaConf.to_container(d, resolve=True)
-    if "hydra" in clean_cfg:
-        del clean_cfg["hydra"]
     return clean_cfg
 
 # -------------------------- Training Settings -------------------------- #
@@ -74,6 +72,7 @@ def main(config):
         mel_spec_kwargs=mel_spec_kwargs,
         vocab_char_map=vocab_char_map,
         tokenized=config.model.tokenized,
+        tokenizer=tokenizer,
     )
 
     if model_cfg.get("use_lora", False):
