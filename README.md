@@ -1,6 +1,6 @@
-<h1 align="center">
+
 Task Vector in TTS: Toward Emotionally Expressive Dialectal Speech Synthesis
-</h1>
+
 
 
 <div align="center">
@@ -30,9 +30,6 @@ In the first stage, we construct different task vectors to model dialectal and e
 
 For the second stage, we hierarchically integrate these vectors to achieve controllableemotionally expressive dialect synthesis without requiring jointly labeled data, corresponding to Hierarchical Expressive Vector (HE-Vector).
 
-## Model
-
-
 
 ## Dataset
 
@@ -50,47 +47,49 @@ For the second stage, we hierarchically integrate these vectors to achieve contr
 
 ### Prerequisites and Base Model Setup
 ```bash
-# Create and activate the conda environment
-conda create -n f5-tts python=3.11
+# 1. Create and activate the conda environment
+conda create -n f5-tts python=3.11 -y
 conda activate f5-tts
 
-# Install PyTorch with CUDA 12.4 support
-pip install torch==2.4.0+cu124 torchaudio==2.4.0+cu124 --extra-index-url https://download.pytorch.org/whl/cu124
+# 2. Install PyTorch with CUDA 12.4 support
+pip install torch==2.4.0+cu124 torchaudio==2.4.0+cu124 \
+  --extra-index-url https://download.pytorch.org/whl/cu124
 
-# Clone and install F5-TTS
+# 3. Clone the repository
+git clone https://github.com/the-bird-F/Expressive-Vectors.git
+cd Expressive-Vectors
+
+# 4. Clone and install F5-TTS
 git clone https://github.com/SWivid/F5-TTS.git
 cd F5-TTS
 pip install -e .
+
+# 5. Set up Python environment
+cd ..
+export PYTHONPATH=./F5-TTS/src:$PYTHONPATH
 ```
 
 
-### HE-Vector Inference
+### E-Vector(Expressive Vector) Training & Inference
 ```bash
-accelerate launch Expressive-Vectors/expressive_vector/my_eval_infer2.py \
-    -s 0 \
-    -c "ckpts/test/sichuan_happy.pt" \
-    -t "Expressive-Vectors/dataset/ESD_use/Happy/eval.csv" \
-    -r "Expressive-Vectors/dataset/Prompt_use/prompt10.csv" \
-    -b "/dataset/Prompt_use/" \
-    -nfe 32 \
-    -o "./"
+# Step 1: Fine-tune the base model
+bash ./scripts/finetuning_model.sh
+
+# Step 2: Extract expressive vectors from the fine-tuned model
+bash ./scripts/mining_model.sh
+
+# Step 3: Evaluate model performance
+bash ./scripts/evaluation_model.sh
 ```
 
-### Complete Training Pipeline
+### HE-Vector(Hierarchical Expressive Vector) Training & Inference
 ```bash
-# Clone the Expressive-Vectors repository
-git clone https://github.com/the-bird-F/Expressive-Vectors.git
+# Training phase
+bash ./scripts/train_he_vector.sh
 
-# Step 1: Finetune the model
-bash ./Expressive-Vectors/scripts/finetuning_model.sh
-
-# Step 2: Construct expressive vectors
-bash ./Expressive-Vectors/scripts/mining_model.sh
-
-# Step 3: Evaluate the model
-bash ./Expressive-Vectors/scripts/evaluation_model.sh
+# Inference phase
+bash ./scripts/infer_he_vector.sh
 ```
-
 
 ## 🔬 Experiment Details
 
@@ -122,6 +121,10 @@ mel_spec_type = "vocos"
 ```
 
 
+## 🙏 Acknowledgements
+
+This project builds upon:
+- [F5-TTS](https://github.com/SWivid/F5-TTS.git)
 
 
 ## 📄 License

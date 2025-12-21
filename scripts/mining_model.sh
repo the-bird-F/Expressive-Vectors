@@ -10,7 +10,7 @@ CKPT_LIST=(
 
 for CKPT in "${CKPT_LIST[@]}"; do
 
-    python Expressive-Vectors/expressive_vector/mining_model.py \
+    python ./expressive_vector/mining_model.py \
         --ckpt_dir ckpts/Tianjing \
         --dataset_name Tianjing_dev \
         --model2 "$CKPT" \

@@ -43,7 +43,7 @@ for style in "${!styles[@]}"; do
         INPUT_CSV="$BASE_INPUT_PATH/$style/eval.csv"
         OUTPUT_DIR="$BASE_OUTPUT_PATH/$style/$emo"
 
-        python Expressive-Vectors/expressive_vector/model_action_multi.py \
+        python ./expressive_vector/model_action_multi.py \
                     --model_dir1 "ckpts/${style}" \
                     --model_dir2 "ckpts/ESD_${emo}" \
                     --model1 "model_60000.pt" \
@@ -52,7 +52,7 @@ for style in "${!styles[@]}"; do
                     --alpha2 $BEST_A \
                     --output_model "ckpts/test/test.pt"
 
-        accelerate launch Expressive-Vectors/expressive_vector/my_eval_infer2.py \
+        accelerate launch ./expressive_vector/my_eval_infer2.py \
             -s $SEED \
             -c "ckpts/test/test.pt" \
             -t $INPUT_CSV \
