@@ -45,7 +45,7 @@ For the second stage, we hierarchically integrate these vectors to achieve contr
 
 ## 🚀 Quick Start
 
-### Prerequisites and Base Model Setup
+### Prepare requisites
 ```bash
 # 1. Clone repo
 git clone --recurse-submodules https://github.com/the-bird-F/Expressive-Vectors.git
