@@ -47,25 +47,20 @@ For the second stage, we hierarchically integrate these vectors to achieve contr
 
 ### Prerequisites and Base Model Setup
 ```bash
-# 1. Create and activate conda environment
-conda create -n f5-tts python=3.11 -y
-conda activate f5-tts
-
-# 2. Install PyTorch with CUDA 12.4 support
-pip install torch==2.4.0+cu124 torchaudio==2.4.0+cu124 \
-  --extra-index-url https://download.pytorch.org/whl/cu124
-
-# 3. Clone repository with all submodules
+# 1. Clone repo
 git clone --recurse-submodules https://github.com/the-bird-F/Expressive-Vectors.git
 cd Expressive-Vectors
 
-# 4. Install F5-TTS (already included as submodule)
+# 2. Create conda environment 
+conda create -n f5-tts python=3.11 -y
+conda activate f5-tts
+pip install torch==2.4.0+cu124 torchaudio==2.4.0+cu124 \
+  --extra-index-url https://download.pytorch.org/whl/cu124
+
+# 3. Install F5-TTS 
 # git submodule update --init --recursive 
 cd F5-TTS
 pip install -e .
-cd ..
-
-# 5. Set up Python Path
 cd ..
 export PYTHONPATH=./F5-TTS/src:$PYTHONPATH
 ```
