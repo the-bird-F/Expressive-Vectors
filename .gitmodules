@@ -1,3 +1,6 @@
 [submodule "src/third_party/BigVGAN"]
 	path = F5-TTS/src/third_party/BigVGAN
 	url = https://github.com/NVIDIA/BigVGAN.git
+[submodule "F5-TTS"]
+	path = F5-TTS
+	url = https://github.com/SWivid/F5-TTS.git
