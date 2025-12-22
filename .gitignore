@@ -3,6 +3,6 @@ __pycache__/
 *.pyc
 *.pyo
 
-F5-TTS/data/**
-F5-TTS/exps/**
-F5-TTS/wandb/**
+f5_tts_lora/data/**
+f5_tts_lora/exps/**
+f5_tts_lora/wandb/**

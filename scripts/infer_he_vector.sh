@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd f5_tts_lora
+
 python -m f5_tts.infer.infer_cli \
   --config-path /mnt/d/Desktop/Academic/X-LANCE/Project/F5-TTS/Expressive-Vectors/F5-TTS/exps/F5TTS_v1_Base_vocos_pinyin_Speech_ESD/2025-12-19_22-21-51 \
   --config-name finetune_config \
