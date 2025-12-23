@@ -7,8 +7,8 @@ Task Vector in TTS: Toward Emotionally Expressive Dialectal Speech Synthesis
     <a href="https://github.com/the-bird-F/Expressive-Vectors" target="_blank">
     <img src="https://img.shields.io/badge/GitHub-Code-blue?logo=github" alt="Github Code"></a>
     <a href="https://the-bird-f.github.io/Expressive-Vectors/" target="_blank"> <img src="https://img.shields.io/badge/Demo-Project%20Page-green?logo=googlechrome" alt="Project Page"></a> 
-    <!-- <a href="https://arxiv.org/abs/2505.00028" target="_blank">
-    <img src="https://img.shields.io/badge/arXiv-2505.00028-red?logo=arxiv" alt="arXiv Paper"></a> -->
+    <a href="https://arxiv.org/abs/2512.18699" target="_blank">
+    <img src="https://img.shields.io/badge/arXiv-2505.00028-red?logo=arxiv" alt="arXiv Paper"></a>
 </div>
 
 

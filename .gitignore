@@ -6,3 +6,4 @@ __pycache__/
 f5_tts_lora/data/**
 f5_tts_lora/exps/**
 f5_tts_lora/wandb/**
+F5-TTS/
