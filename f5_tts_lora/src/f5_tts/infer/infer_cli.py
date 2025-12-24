@@ -1,31 +1,22 @@
-import argparse
-import codecs
-from html import parser
 import os
 import re
 import json
-from weakref import ref
 import hydra
 import logging
-from datetime import datetime
-from importlib.resources import files
-from pathlib import Path
 
 import numpy as np
 import soundfile as sf
-import tomli
-from cached_path import cached_path
 from hydra.utils import get_class
-from omegaconf import OmegaConf
-from unidecode import unidecode
 
+from f5_tts.model import CFM
+from f5_tts.model.utils import get_tokenizer
 from f5_tts.infer.utils_infer import (
     cfg_strength,
     cross_fade_duration,
     device,
     fix_duration,
     infer_process,
-    load_model,
+    load_checkpoint,
     load_vocoder,
     nfe_step,
     preprocess_ref_audio_text,
@@ -46,6 +37,7 @@ logging.basicConfig(
 def main(config):
     save_dir = config.ckpts.save_dir
     model = config.model.backbone
+    cfg_device = config.gen.get("device", device)
 
     ckpt_file = config.gen.get("ckpt_file", os.path.join(save_dir, "ckpts/model_last.pt"))
     vocab_file = config.model.get("vocab_file", os.path.join(save_dir, "vocab.txt"))
@@ -79,34 +71,53 @@ def main(config):
     cfg_sway_sampling_coef = config.gen.get("sway_sampling_coef", sway_sampling_coef)
     cfg_speed = config.gen.get("speed", speed)
     cfg_fix_duration = config.gen.get("fix_duration", fix_duration)
-    cfg_device = config.gen.get("device", device)
+    
+    tokenizer = config.model.tokenizer
+
+    mel_spec_kwargs = dict(
+        n_fft=config.model.mel_spec.n_fft,
+        hop_length=config.model.mel_spec.hop_length,
+        win_length=config.model.mel_spec.win_length,
+        n_mel_channels=config.model.mel_spec.n_mel_channels,
+        target_sample_rate=config.model.mel_spec.target_sample_rate,
+        mel_spec_type=config.model.mel_spec.mel_spec_type,
+    )
 
     # output path
 
-    output_dir = config.gen.get("output_dir", os.path.join(save_dir, "examples"))
-    wave_path = Path(output_dir) / output_file
+    use_lora = config.model.arch.get("use_lora", False)
+    default_output_dir = os.path.join(save_dir, "examples")
+    output_dir = config.gen.get("output_dir", default_output_dir)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir, exist_ok=True)
+
+    # load tokenizer and vocoder
+    if vocab_file is None:
+        vocab_char_map, vocab_size = get_tokenizer(config.datasets.name, tokenizer)
+    else:
+        vocab_char_map, vocab_size = get_tokenizer(vocab_file, "custom")
 
     vocoder = load_vocoder(
         vocoder_name=config.model.mel_spec.mel_spec_type, 
         is_local=config.model.vocoder.is_local, 
         local_path=config.model.vocoder.local_path, 
-        device=cfg_device
     )
 
     # load TTS model
 
     model_cls = get_class(f"f5_tts.model.{model}")
     model_arc = config.model.arch
+    tokenized = config.model.get("tokenized", False)
 
     print(f"Using {model}...")
-    ema_model = load_model(
-        model_cls, 
-        model_arc, 
-        ckpt_file, 
-        mel_spec_type=config.model.mel_spec.mel_spec_type, 
-        vocab_file=vocab_file, 
-        device=cfg_device
-    )
+    model = CFM(
+        transformer=model_cls(**model_arc, text_num_embeds=vocab_size, mel_dim=config.model.mel_spec.n_mel_channels),
+        mel_spec_kwargs=mel_spec_kwargs,
+        vocab_char_map=vocab_char_map,
+        tokenized=tokenized,
+        tokenizer=tokenizer,
+    ).to(device)
+    ema_model = load_checkpoint(model, ckpt_file, cfg_device, use_ema=True)
 
     main_voice = {"ref_audio": ref_audio, "ref_text": ref_text}
     if "voices" not in config:
@@ -168,9 +179,9 @@ def main(config):
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-        with open(wave_path, "wb") as f:
+        with open(os.path.join(output_dir, output_file), "wb") as f:
             sf.write(f.name, final_wave, final_sample_rate)
-            logging.info(f"Saved generated audio to {f.name}")
+            logging.info(f"Saved generated audio to {os.path.abspath(f.name)}")
 
 
 if __name__ == "__main__":
