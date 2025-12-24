@@ -110,9 +110,9 @@ class Trainer:
             self.ema_model = EMA(model, include_online_model=False, **ema_kwargs)
             self.ema_model.to(self.accelerator.device)
 
-            print(f"Using logger: {logger}")
+            logging.info(f"Using logger: {logger}")
             if grad_accumulation_steps > 1:
-                print(
+                logging.info(
                     "Gradient accumulation checkpointing with per_updates now, old logic per_steps used with before f992c4e"
                 )
 
@@ -169,7 +169,7 @@ class Trainer:
                 os.makedirs(self.checkpoint_path)
             if last:
                 self.accelerator.save(checkpoint, f"{self.checkpoint_path}/model_last.pt")
-                print(f"Saved last checkpoint at update {update}")
+                logging.info(f"Saved last checkpoint at update {update}")
             else:
                 if self.keep_last_n_checkpoints == 0:
                     return
@@ -188,7 +188,7 @@ class Trainer:
                     while len(checkpoints) > self.keep_last_n_checkpoints:
                         oldest_checkpoint = checkpoints.pop(0)
                         os.remove(os.path.join(self.checkpoint_path, oldest_checkpoint))
-                        print(f"Removed old checkpoint: {oldest_checkpoint}")
+                        logging.info(f"Removed old checkpoint: {oldest_checkpoint}")
 
     def load_checkpoint(self):
         if (
@@ -247,7 +247,7 @@ class Trainer:
             if "step" in checkpoint:
                 checkpoint["update"] = checkpoint["step"] // self.grad_accumulation_steps
                 if self.grad_accumulation_steps > 1 and self.is_main:
-                    print(
+                    logging.warning(
                         "F5-TTS WARNING: Loading checkpoint saved with per_steps logic (before f992c4e), will convert to per_updates according to grad_accumulation_steps setting, may have unexpected behaviour."
                     )
             # patch for backward compatibility, 305e3ea
@@ -469,7 +469,14 @@ class Trainer:
                 if global_update % self.last_per_updates == 0 and self.accelerator.sync_gradients:
                     if self.eval_valid:
                         valid_loss = self.evaluate(valid_dataloader)
-                        if self.best_valid_loss  > valid_loss:
+                        if self.is_main:
+                            self.accelerator.log(
+                                {"valid_loss": valid_loss}, step=global_update
+                            )
+                            if self.logger == "tensorboard":
+                                self.writer.add_scalar("valid_loss", valid_loss, global_update)
+
+                        if self.best_valid_loss > valid_loss:
                             self.best_valid_loss = valid_loss
                             self.save_checkpoint(global_update, last=True)
                             if self.is_main:
@@ -491,7 +498,10 @@ class Trainer:
                         else:
                             infer_text = [text_inputs[0] + " " + text_inputs[0]]
                         if self.use_lora:
-                            lora_idx_infer = lora_idx if isinstance(lora_idx, int) else lora_idx[0]
+                            if lora_idx is None or lora_idx.dim() == 1:
+                                lora_idx_infer = lora_idx
+                            else:
+                                lora_idx_infer = lora_idx[0]
                         with torch.inference_mode():
                             generated, _ = self.accelerator.unwrap_model(self.model).sample(
                                 cond=mel_spec[0][:ref_audio_len].unsqueeze(0),

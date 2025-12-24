@@ -2,10 +2,11 @@ import os
 from httpx import get
 import hydra
 from hydra.utils import to_absolute_path, get_class
+from hydra.core.hydra_config import HydraConfig
 import shutil
 import logging
 from importlib.resources import files
-from omegaconf import OmegaConf
+from omegaconf import OmegaConf, open_dict
 
 from cached_path import cached_path
 
@@ -19,22 +20,34 @@ logging.basicConfig(
 
 
 def clean_config(d):
-    clean_cfg = OmegaConf.to_container(d, resolve=True)
-    return clean_cfg
+    cfg_copy = d.copy()
+    try:
+        actual_run_dir = HydraConfig.get().runtime.output_dir
+    except (RuntimeError, ValueError):
+        actual_run_dir = os.getcwd()
+    with open_dict(cfg_copy):
+        cfg_copy.hydra = {
+            "run": {
+                "dir": actual_run_dir
+            }
+        }
+    return OmegaConf.to_container(cfg_copy, resolve=True)
 
 # -------------------------- Training Settings -------------------------- #
 
 
 @hydra.main(config_path=str(files("f5_tts").joinpath("configs")), config_name="F5TTS_v1_Base.yaml", version_base="1.3")
 def main(config):
+    save_dir = str(config.ckpts.get("save_dir", "exps/F5TTS_finetune"))
+    ckpt_save_dir = os.path.join(save_dir, "ckpts")
+    os.makedirs(ckpt_save_dir, exist_ok=True)
+
+    OmegaConf.save(clean_config(config), os.path.join(save_dir, "config.yaml"))
+
     if config.ckpts.pretrain is None:
         ckpt_path = str(cached_path("hf://SWivid/F5-TTS/F5TTS_v1_Base/model_1250000.safetensors"))
     else:
         ckpt_path = to_absolute_path(config.ckpts.pretrain)
-
-    save_dir = config.ckpts.get("save_dir", "exps/F5TTS_finetune")
-    ckpt_save_dir = os.path.join(save_dir, "ckpts")
-    os.makedirs(ckpt_save_dir, exist_ok=True)
 
     file_checkpoint = os.path.basename(ckpt_path)
     if not file_checkpoint.startswith("pretrained_"):  # Change: Add 'pretrained_' prefix to copied model
@@ -45,6 +58,7 @@ def main(config):
         print("copy checkpoint for finetune")
 
     tokenizer = config.model.tokenizer
+    tokenized = config.model.get("tokenized", False)
     vocab_char_map, vocab_size = get_tokenizer(config.datasets.name, tokenizer)
     if tokenizer in ["pinyin", "char"]:
         vocab_file = os.path.join(
@@ -71,7 +85,7 @@ def main(config):
         transformer=model_cls(**model_cfg, text_num_embeds=vocab_size, mel_dim=config.model.mel_spec.n_mel_channels),
         mel_spec_kwargs=mel_spec_kwargs,
         vocab_char_map=vocab_char_map,
-        tokenized=config.model.tokenized,
+        tokenized=tokenized,
         tokenizer=tokenizer,
     )
 
@@ -130,8 +144,6 @@ def main(config):
         mel_spec_kwargs=mel_spec_kwargs,
         use_lora=model_cfg.get("use_lora", False),
     )
-
-    OmegaConf.save(clean_config(config), os.path.join(save_dir, "finetune_config.yaml"))
 
     trainer.train(
         train_dataset,

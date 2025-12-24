@@ -255,10 +255,11 @@ class CFM(nn.Module):
 
         # handle text as string
         if isinstance(text, list):
-            if exists(self.vocab_char_map):
-                text = list_str_to_idx(text, self.vocab_char_map).to(device)
+            if self.tokenized:
+                text = idx_to_tensor(text).to(device)
             else:
-                text = list_str_to_tensor(text).to(device)
+                assert exists(self.vocab_char_map), "vocab_char_map missing"
+                text = list_str_to_idx(text, self.vocab_char_map).to(device)
             assert text.shape[0] == batch
 
         # lens and mask
